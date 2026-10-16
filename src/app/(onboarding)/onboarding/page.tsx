@@ -10,7 +10,7 @@ import type { LookupResponse } from "@/lib/api/types";
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { refreshUser } = useAuth();
+  const { refreshUser, isOnboarded } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,6 +27,13 @@ export default function OnboardingPage() {
     city: "",
     website: "",
   });
+
+  // Guard: if already onboarded, redirect to discover
+  useEffect(() => {
+    if (isOnboarded) {
+      router.replace("/discover");
+    }
+  }, [isOnboarded, router]);
 
   // Fetch lookups on mount
   useEffect(() => {
@@ -56,6 +63,13 @@ export default function OnboardingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Guard: don't submit if already onboarded
+    if (isOnboarded) {
+      router.replace("/discover");
+      return;
+    }
+    
     setIsSubmitting(true);
     setError(null);
 
