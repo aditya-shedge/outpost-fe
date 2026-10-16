@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Manrope, IBM_Plex_Mono } from "next/font/google";
+import { AuthProvider } from "@/lib/auth/context";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -36,7 +37,7 @@ export default function RootLayout({
       className={`${dmSans.variable} ${manrope.variable} ${ibmPlexMono.variable}`}
     >
       <body className="min-h-screen bg-paper text-ink font-sans antialiased">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
