@@ -97,15 +97,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, isLoading: true }));
       try {
         await authApi.signup({ email, password });
-        const user = await authApi.getMe();
-        updateUserState(user);
+        // Don't call getMe() - user needs to verify email first
+        // Just set minimal state and redirect to verify-email
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          isAuthenticated: true,
+          isVerified: false,
+          isOnboarded: false,
+          user: { email } as User,
+        }));
         router.push("/verify-email");
       } catch (error) {
         setState((prev) => ({ ...prev, isLoading: false }));
         throw error;
       }
     },
-    [router, updateUserState]
+    [router]
   );
 
   const logout = useCallback(() => {
