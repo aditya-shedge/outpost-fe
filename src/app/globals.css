@@ -1,26 +1,206 @@
 @import "tailwindcss";
 
+/* ============================================
+   OUTPOST DESIGN SYSTEM
+   Field-notes editorial aesthetic
+   ============================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base Colors */
+  --ink: #202c3d;
+  --paper: #f7f4ec;
+  --paper-light: #fbf9f3;
+  --line: #ded7ca;
+  
+  /* Accent Colors */
+  --gold: #d69b42;
+  --gold-dark: #94651f;
+  --gold-hover: #a56f28;
+  --gold-light: #f2e5cc;
+  
+  --green: #467c68;
+  --green-light: #deebe4;
+  --green-dark: #376c59;
+  
+  --rose: #b86a64;
+  --rose-light: #f0dfdc;
+  --rose-dark: #9a5550;
+  
+  /* Text Colors */
+  --muted: #72777b;
+  --placeholder: #9a9b97;
+  
+  /* Sidebar (Dark) */
+  --sidebar-bg: #202c3d;
+  --sidebar-text: #f7f4ec;
+  --sidebar-accent: #e5b45d;
+  --sidebar-muted: #c3c8c9;
+  
+  /* Category Badge Colors */
+  --grant-bg: #f1e6d2;
+  --grant-text: #80591f;
+  --grant-dot: #d2a351;
+  
+  --challenge-bg: #e2ece5;
+  --challenge-text: #376b58;
+  --challenge-dot: #57826c;
+  
+  --mentor-bg: #f0e2df;
+  --mentor-text: #925651;
+  --mentor-dot: #bc7369;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Colors */
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-paper-light: var(--paper-light);
+  --color-line: var(--line);
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-hover: var(--gold-hover);
+  --color-gold-light: var(--gold-light);
+  --color-green: var(--green);
+  --color-green-light: var(--green-light);
+  --color-green-dark: var(--green-dark);
+  --color-rose: var(--rose);
+  --color-rose-light: var(--rose-light);
+  --color-rose-dark: var(--rose-dark);
+  --color-muted: var(--muted);
+  --color-placeholder: var(--placeholder);
+  --color-sidebar: var(--sidebar-bg);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-muted: var(--sidebar-muted);
+  
+  /* Fonts */
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-serif: var(--font-manrope), system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: rgba(214, 155, 66, 0.32);
+  color: var(--ink);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Mono label - uppercase tracking */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+/* Paper grid background */
+.paper-grid {
+  background-image: 
+    linear-gradient(to right, rgba(32, 44, 61, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(32, 44, 61, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Font family utilities */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: rise-in 0.55s cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.rise-delay-1 { animation-delay: 0.08s; }
+.rise-delay-2 { animation-delay: 0.16s; }
+.rise-delay-3 { animation-delay: 0.24s; }
+
+@keyframes pulse {
+  50% { opacity: 0.5; }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   BUTTON BASE STYLES
+   ============================================ */
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ============================================
+   LINK STYLES
+   ============================================ */
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
 }
