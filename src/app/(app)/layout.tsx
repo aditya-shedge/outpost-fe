@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { Brand } from "@/components/ui/brand";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -49,8 +50,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1">{children}</main>
-      <Footer />
+      <main className="flex-1 pb-16 md:pb-0">{children}</main>
+      <Footer className="hidden md:block" />
+      <MobileNav />
     </div>
   );
 }
