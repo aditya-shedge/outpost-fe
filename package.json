@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+   "generate:api": "npx openapi-typescript http://localhost:8080/v3/api-docs -o src/lib/api.d.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -18,7 +18,8 @@
   },
   "resources": [
     "file://../artifacts/**/*.md",
-    "file://./guidelines/**/*.md"
+    "file://./guidelines/**/*.md",
+    "file://./docs/API_REFERENCE.md"
   ],
   "hooks": {},
   "useLegacyMcpJson": true,

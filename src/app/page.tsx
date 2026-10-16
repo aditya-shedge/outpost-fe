@@ -32,7 +32,8 @@ export default function Home() {
               <div className="flex items-center gap-6 flex-wrap">
                 <Link 
                   href="/login" 
-                  className="inline-flex items-center justify-center gap-5 min-h-[48px] px-5 border border-ink bg-ink text-paper-light font-semibold text-[13px] transition-all hover:translate-y-[-2px] hover:bg-[#304258]"
+                  className="inline-flex items-center justify-center gap-5 min-h-[48px] px-5 border border-ink bg-ink font-semibold text-[13px] transition-all hover:translate-y-[-2px] hover:bg-[#304258]"
+                  style={{ color: '#f7f4ec' }}
                 >
                   I&apos;m a T-Hub founder
                   <ArrowIcon />
