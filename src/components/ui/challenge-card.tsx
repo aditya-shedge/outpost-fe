@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/ui";
+import { BookmarkButton } from "@/components/ui/bookmark-button";
 import type { ChallengeWithAi } from "@/lib/api/types";
 
 interface ChallengeCardProps {
@@ -60,6 +61,14 @@ export function ChallengeCard({ challenge, showAiReason = true }: ChallengeCardP
             {challenge.title}
           </h3>
         </div>
+
+        <BookmarkButton
+          item={{
+            id: challenge.id!,
+            type: "challenge",
+            name: challenge.title || "Challenge",
+          }}
+        />
       </div>
 
       {/* Status badge row */}

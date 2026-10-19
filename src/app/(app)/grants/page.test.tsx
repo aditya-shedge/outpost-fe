@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import GrantsPage from "./page";
+import { SavedItemsProvider } from "@/lib/saved/context";
 
 // Mock next/navigation
 const mockPush = jest.fn();
@@ -15,6 +16,15 @@ jest.mock("@/lib/auth/context", () => ({
     isOnboarded: true,
   }),
 }));
+
+// Mock sonner toast
+jest.mock("sonner", () => ({
+  toast: { success: jest.fn() },
+}));
+
+const renderWithProvider = (ui: React.ReactNode) => {
+  return render(<SavedItemsProvider>{ui}</SavedItemsProvider>);
+};
 
 // Mock API functions
 jest.mock("@/lib/api/grants", () => ({
@@ -62,7 +72,7 @@ describe("Grants Listing Page (FE-019)", () => {
   });
 
   it("renders page header with title", async () => {
-    render(<GrantsPage />);
+    renderWithProvider(<GrantsPage />);
     
     await waitFor(() => {
       expect(screen.getByText("Grants & Schemes")).toBeInTheDocument();
@@ -70,7 +80,7 @@ describe("Grants Listing Page (FE-019)", () => {
   });
 
   it("displays filter dropdowns", async () => {
-    render(<GrantsPage />);
+    renderWithProvider(<GrantsPage />);
     
     await waitFor(() => {
       expect(screen.getByLabelText("Source")).toBeInTheDocument();
@@ -83,7 +93,7 @@ describe("Grants Listing Page (FE-019)", () => {
   });
 
   it("shows search input", async () => {
-    render(<GrantsPage />);
+    renderWithProvider(<GrantsPage />);
     
     await waitFor(() => {
       expect(screen.getByPlaceholderText("Search grants...")).toBeInTheDocument();
@@ -91,7 +101,7 @@ describe("Grants Listing Page (FE-019)", () => {
   });
 
   it("shows AI toggle for onboarded users", async () => {
-    render(<GrantsPage />);
+    renderWithProvider(<GrantsPage />);
     
     await waitFor(() => {
       expect(screen.getByText("AI Ranking")).toBeInTheDocument();
@@ -99,7 +109,7 @@ describe("Grants Listing Page (FE-019)", () => {
   });
 
   it("displays grants after loading", async () => {
-    render(<GrantsPage />);
+    renderWithProvider(<GrantsPage />);
     
     await waitFor(() => {
       expect(screen.getByText("Startup India Seed Fund")).toBeInTheDocument();
@@ -108,7 +118,7 @@ describe("Grants Listing Page (FE-019)", () => {
   });
 
   it("shows results count", async () => {
-    render(<GrantsPage />);
+    renderWithProvider(<GrantsPage />);
     
     await waitFor(() => {
       expect(screen.getByText(/Showing/)).toBeInTheDocument();
@@ -119,7 +129,7 @@ describe("Grants Listing Page (FE-019)", () => {
 
   it("filters can be changed", async () => {
     const user = userEvent.setup();
-    render(<GrantsPage />);
+    renderWithProvider(<GrantsPage />);
     
     await waitFor(() => {
       expect(screen.getByLabelText("Type")).toBeInTheDocument();

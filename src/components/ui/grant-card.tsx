@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/ui";
+import { BookmarkButton } from "@/components/ui/bookmark-button";
 import type { GrantWithAi } from "@/lib/api/types";
 
 interface GrantCardProps {
@@ -59,18 +60,13 @@ export function GrantCard({ grant, showAiReason = true }: GrantCardProps) {
               Ending soon
             </span>
           )}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Bookmark functionality will be added later
+          <BookmarkButton
+            item={{
+              id: grant.id!,
+              type: "grant",
+              name: grant.name || "Grant",
             }}
-            className="text-muted hover:text-gold-dark transition-colors"
-            aria-label="Save grant"
-          >
-            <Icon name="bookmark" className="size-4" />
-          </button>
+          />
         </div>
       </div>
 

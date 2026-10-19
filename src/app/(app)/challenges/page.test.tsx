@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ChallengesPage from "./page";
+import { SavedItemsProvider } from "@/lib/saved/context";
 
 // Mock modules
 const mockPush = jest.fn();
@@ -21,6 +22,15 @@ jest.mock("@/lib/auth/context", () => ({
     user: { id: "user-1", founderName: "Test User" },
   }),
 }));
+
+// Mock sonner toast
+jest.mock("sonner", () => ({
+  toast: { success: jest.fn() },
+}));
+
+const renderWithProvider = (ui: React.ReactNode) => {
+  return render(<SavedItemsProvider>{ui}</SavedItemsProvider>);
+};
 
 jest.mock("@/lib/api/challenges", () => ({
   getChallenges: jest.fn().mockResolvedValue({
@@ -67,7 +77,7 @@ describe("ChallengesPage", () => {
   });
 
   it("renders page title and description", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       expect(screen.getByText("Corporate Challenges")).toBeInTheDocument();
@@ -76,7 +86,7 @@ describe("ChallengesPage", () => {
   });
 
   it("shows search input", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText("Search challenges...")).toBeInTheDocument();
@@ -84,7 +94,7 @@ describe("ChallengesPage", () => {
   });
 
   it("shows AI toggle for onboarded users", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       expect(screen.getByText("AI Ranking")).toBeInTheDocument();
@@ -92,7 +102,7 @@ describe("ChallengesPage", () => {
   });
 
   it("shows filter dropdowns", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       expect(screen.getByRole("combobox", { name: "Sector" })).toBeInTheDocument();
@@ -102,7 +112,7 @@ describe("ChallengesPage", () => {
   });
 
   it("shows corporate name filter input", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText("Corporate name...")).toBeInTheDocument();
@@ -110,7 +120,7 @@ describe("ChallengesPage", () => {
   });
 
   it("displays challenge cards", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       expect(screen.getByText("AI Innovation Challenge")).toBeInTheDocument();
@@ -119,7 +129,7 @@ describe("ChallengesPage", () => {
   });
 
   it("shows results count", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       expect(screen.getByText(/Showing/)).toBeInTheDocument();
@@ -130,7 +140,7 @@ describe("ChallengesPage", () => {
   });
 
   it("shows both open and closed challenges", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       // Open challenge
@@ -141,7 +151,7 @@ describe("ChallengesPage", () => {
   });
 
   it("populates sector filter with options from API", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     // Wait for sectors to load - the sector select should eventually have more than just "All Sectors"
     await waitFor(() => {
@@ -159,7 +169,7 @@ describe("ChallengesPage", () => {
   });
 
   it("populates theme filter with options from API", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     // Wait for themes to load
     await waitFor(() => {
@@ -177,7 +187,7 @@ describe("ChallengesPage", () => {
   });
 
   it("shows status filter options", async () => {
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       const statusSelect = screen.getByRole("combobox", { name: "Status" });
@@ -194,7 +204,7 @@ describe("ChallengesPage", () => {
 
   it("shows Clear all button when filters are active", async () => {
     const user = userEvent.setup();
-    render(<ChallengesPage />);
+    renderWithProvider(<ChallengesPage />);
 
     await waitFor(() => {
       expect(screen.getByRole("combobox", { name: "Status" })).toBeInTheDocument();
