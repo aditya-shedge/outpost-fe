@@ -85,8 +85,16 @@ function GrantsContent() {
   const [amountBand, setAmountBand] = useState(searchParams.get("amountBand") || "");
   const [deadline, setDeadline] = useState(searchParams.get("deadline") || "");
   const [includeExpired, setIncludeExpired] = useState(searchParams.get("includeExpired") === "true");
-  const [aiEnabled, setAiEnabled] = useState(searchParams.get("ai") === "true");
+  const [aiEnabled, setAiEnabled] = useState(() => {
+    // Check URL first, then localStorage
+    if (searchParams.get("ai") === "true") return true;
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("ai-ranking-enabled") === "true";
+    }
+    return false;
+  });
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 0);
+  const [aiApplied, setAiApplied] = useState(false);
 
   // Load lookups on mount
   useEffect(() => {
@@ -129,6 +137,8 @@ function GrantsContent() {
       const response = await getGrants(params);
       setGrants(response.content);
       setPage(response.page);
+      // Track if AI was actually applied (some grants might have aiApplied field)
+      setAiApplied(response.content.some(g => g.aiApplied === true));
     } catch (err) {
       setError("Failed to load grants. Please try again.");
       console.error("Failed to fetch grants:", err);
@@ -235,8 +245,13 @@ function GrantsContent() {
                 type="checkbox"
                 checked={aiEnabled}
                 onChange={(e) => {
-                  setAiEnabled(e.target.checked);
+                  const enabled = e.target.checked;
+                  setAiEnabled(enabled);
                   setCurrentPage(0);
+                  // Persist to localStorage
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("ai-ranking-enabled", String(enabled));
+                  }
                 }}
                 className="sr-only peer"
               />
@@ -327,8 +342,11 @@ function GrantsContent() {
             <>
               Showing <span className="font-semibold text-ink">{grants.length}</span> of{" "}
               <span className="font-semibold text-ink">{page.totalElements}</span> grants
-              {aiEnabled && grants.some(g => g.aiApplied) && (
+              {aiEnabled && aiApplied && (
                 <span className="ml-2 text-gold-dark">• AI ranked for you</span>
+              )}
+              {aiEnabled && !aiApplied && grants.length > 0 && (
+                <span className="ml-2 text-muted">• Showing standard results</span>
               )}
             </>
           )}
