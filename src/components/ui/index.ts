@@ -10,7 +10,7 @@ export { GoogleButton } from "./google-button";
 
 // Feature cards
 export { OpportunityCard } from "./opportunity-card";
-export { MentorCard } from "./mentor-card";
+export { MentorCard, MentorCardSkeleton } from "./mentor-card";
 export { GrantCard, GrantCardSkeleton } from "./grant-card";
 export { ChallengeCard, ChallengeCardSkeleton } from "./challenge-card";
 

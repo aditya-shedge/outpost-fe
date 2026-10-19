@@ -116,3 +116,30 @@ export function MentorCard({ mentor, variant = "light", showAiReason = false }: 
     </article>
   );
 }
+
+// Skeleton loader for mentor card
+export function MentorCardSkeleton({ variant = "light" }: { variant?: "light" | "dark" }) {
+  const isDark = variant === "dark";
+  
+  return (
+    <div className={`p-5 animate-pulse ${
+      isDark 
+        ? "bg-[#1e2b24] border border-[#2d3d33]" 
+        : "bg-paper-light border border-line"
+    }`}>
+      <div className="flex items-start gap-4 mb-4">
+        <div className={`w-14 h-14 rounded-full ${isDark ? "bg-[#2d3d33]" : "bg-line"}`} />
+        <div className="flex-1">
+          <div className={`h-4 w-24 mb-2 ${isDark ? "bg-[#2d3d33]" : "bg-line"}`} />
+          <div className={`h-3 w-32 ${isDark ? "bg-[#2d3d33]" : "bg-line"}`} />
+        </div>
+      </div>
+      <div className="flex gap-2 mb-4">
+        <div className={`h-6 w-16 ${isDark ? "bg-[#2d3d33]" : "bg-line"}`} />
+        <div className={`h-6 w-20 ${isDark ? "bg-[#2d3d33]" : "bg-line"}`} />
+        <div className={`h-6 w-14 ${isDark ? "bg-[#2d3d33]" : "bg-line"}`} />
+      </div>
+      <div className={`h-10 w-full ${isDark ? "bg-[#2d3d33]" : "bg-line"}`} />
+    </div>
+  );
+}
