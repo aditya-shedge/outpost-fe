@@ -12,6 +12,7 @@ export { GoogleButton } from "./google-button";
 export { OpportunityCard } from "./opportunity-card";
 export { MentorCard } from "./mentor-card";
 export { GrantCard, GrantCardSkeleton } from "./grant-card";
+export { ChallengeCard, ChallengeCardSkeleton } from "./challenge-card";
 
 // Loading and error states
 export { LoadingSpinner } from "./loading-spinner";
