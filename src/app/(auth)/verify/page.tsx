@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState, useRef } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { authApi } from "@/lib/api/auth";
@@ -20,38 +20,43 @@ function VerifyContent() {
   const [errorMessage, setErrorMessage] = useState<string>(
     token ? "" : "No verification token provided"
   );
-  const hasVerified = useRef(false);
 
   useEffect(() => {
-    if (!token || hasVerified.current) {
+    if (!token) {
       return;
     }
 
-    hasVerified.current = true;
+    let isCancelled = false;
 
     const verifyEmail = async () => {
       try {
         await authApi.verify({ token });
+        if (isCancelled) return;
+        
         setStatus("success");
         showToast.success("Email verified successfully!");
-        // Redirect to login after a short delay
         setTimeout(() => {
           router.push("/login");
         }, 2000);
       } catch (err) {
+        if (isCancelled) return;
+        
         console.error("Verification error:", err);
         if (err instanceof ApiClientError) {
-          if (err.code === "TOKEN_INVALID" || err.code === "TOKEN_EXPIRED") {
-            setErrorMessage("This verification link is invalid or has expired.");
-          } else if (err.code === "ALREADY_VERIFIED") {
-            // User is already verified - redirect to login
+          // Handle "already verified" as success - this happens if:
+          // 1. User clicks link twice
+          // 2. React Strict Mode causes a second call
+          // 3. Token was already used
+          if (err.code === "ALREADY_VERIFIED" || err.code === "TOKEN_USED") {
             setStatus("success");
-            setErrorMessage("");
-            showToast.success("Email already verified!");
+            showToast.success("Email verified!");
             setTimeout(() => {
               router.push("/login");
             }, 2000);
             return;
+          }
+          if (err.code === "TOKEN_INVALID" || err.code === "TOKEN_EXPIRED") {
+            setErrorMessage("This verification link is invalid or has expired.");
           } else {
             setErrorMessage(err.message || "Verification failed. Please try again.");
           }
@@ -65,6 +70,10 @@ function VerifyContent() {
     };
 
     verifyEmail();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [token, router]);
 
   const showError = status === "error" || status === "no-token";
