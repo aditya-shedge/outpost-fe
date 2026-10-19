@@ -14,6 +14,7 @@ export { MentorCard, MentorCardSkeleton } from "./mentor-card";
 export { GrantCard, GrantCardSkeleton } from "./grant-card";
 export { ChallengeCard, ChallengeCardSkeleton } from "./challenge-card";
 export { SpotlightSection } from "./spotlight-section";
+export { BenefitCard, BenefitCardSkeleton } from "./benefit-card";
 
 // Loading and error states
 export { LoadingSpinner } from "./loading-spinner";
