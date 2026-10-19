@@ -13,6 +13,7 @@ export { OpportunityCard } from "./opportunity-card";
 export { MentorCard, MentorCardSkeleton } from "./mentor-card";
 export { GrantCard, GrantCardSkeleton } from "./grant-card";
 export { ChallengeCard, ChallengeCardSkeleton } from "./challenge-card";
+export { SpotlightSection } from "./spotlight-section";
 
 // Loading and error states
 export { LoadingSpinner } from "./loading-spinner";
