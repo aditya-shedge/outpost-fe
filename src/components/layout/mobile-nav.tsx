@@ -8,6 +8,7 @@ const navItems = [
   { href: "/discover", label: "Discover", icon: HomeIcon },
   { href: "/grants", label: "Opportunities", icon: GridIcon },
   { href: "/mentors", label: "Mentors", icon: MentorsIcon },
+  { href: "/saved", label: "Saved", icon: BookmarkIcon },
 ];
 
 export function MobileNav() {
@@ -91,6 +92,22 @@ function MentorsIcon({ className }: { className?: string }) {
       <circle cx="9" cy="7" r="4" />
       <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+function BookmarkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
     </svg>
   );
 }
