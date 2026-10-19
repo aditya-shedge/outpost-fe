@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/context";
 import { getGrants, GrantsListParams } from "@/lib/api/grants";
 import { getStages, getSectors } from "@/lib/api/lookups";
+import { LoadingSpinner } from "@/components/ui";
+import { GrantCard, GrantCardSkeleton } from "@/components/ui/grant-card";
 import type { LookupResponse, GrantWithAi, PageMetadata } from "@/lib/api/types";
 
 const ISSUING_BODY_TYPES = [
@@ -23,7 +25,40 @@ const GRANT_TYPES = [
   { value: "INCENTIVE", label: "Incentive" },
 ] as const;
 
+const AMOUNT_BANDS = [
+  { value: "", label: "Any Amount" },
+  { value: "UNDER_10L", label: "Under ₹10L" },
+  { value: "10L_TO_50L", label: "₹10L - 50L" },
+  { value: "50L_TO_1CR", label: "₹50L - 1Cr" },
+  { value: "OVER_1CR", label: "Over ₹1Cr" },
+] as const;
+
+const DEADLINE_OPTIONS = [
+  { value: "", label: "Any Deadline" },
+  { value: "OPEN", label: "Open now" },
+  { value: "CLOSING_THIS_MONTH", label: "Closing this month" },
+  { value: "ROLLING", label: "Rolling" },
+] as const;
+
 export default function GrantsPage() {
+  return (
+    <Suspense fallback={<GrantsPageLoading />}>
+      <GrantsContent />
+    </Suspense>
+  );
+}
+
+function GrantsPageLoading() {
+  return (
+    <div className="max-w-[1100px] mx-auto py-12 px-7">
+      <div className="flex items-center justify-center min-h-[400px]">
+        <LoadingSpinner size="lg" />
+      </div>
+    </div>
+  );
+}
+
+function GrantsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isOnboarded } = useAuth();
@@ -47,6 +82,8 @@ export default function GrantsPage() {
   const [grantType, setGrantType] = useState(searchParams.get("type") || "");
   const [stageId, setStageId] = useState(searchParams.get("stageId") || "");
   const [sectorId, setSectorId] = useState(searchParams.get("sectorId") || "");
+  const [amountBand, setAmountBand] = useState(searchParams.get("amountBand") || "");
+  const [deadline, setDeadline] = useState(searchParams.get("deadline") || "");
   const [includeExpired, setIncludeExpired] = useState(searchParams.get("includeExpired") === "true");
   const [aiEnabled, setAiEnabled] = useState(searchParams.get("ai") === "true");
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 0);
@@ -84,6 +121,8 @@ export default function GrantsPage() {
       if (grantType) params.type = grantType as GrantsListParams["type"];
       if (stageId) params.stageId = stageId;
       if (sectorId) params.sectorId = sectorId;
+      if (amountBand) params.amountBand = amountBand;
+      if (deadline) params.deadline = deadline;
       if (includeExpired) params.includeExpired = true;
       if (aiEnabled && isOnboarded) params.ai = true;
 
@@ -96,7 +135,7 @@ export default function GrantsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, search, issuingBodyType, grantType, stageId, sectorId, includeExpired, aiEnabled, isOnboarded]);
+  }, [currentPage, search, issuingBodyType, grantType, stageId, sectorId, amountBand, deadline, includeExpired, aiEnabled, isOnboarded]);
 
   useEffect(() => {
     fetchGrants();
@@ -110,13 +149,15 @@ export default function GrantsPage() {
     if (grantType) params.set("type", grantType);
     if (stageId) params.set("stageId", stageId);
     if (sectorId) params.set("sectorId", sectorId);
+    if (amountBand) params.set("amountBand", amountBand);
+    if (deadline) params.set("deadline", deadline);
     if (includeExpired) params.set("includeExpired", "true");
     if (aiEnabled) params.set("ai", "true");
     if (currentPage > 0) params.set("page", String(currentPage));
 
     const queryString = params.toString();
     router.push(`/grants${queryString ? `?${queryString}` : ""}`, { scroll: false });
-  }, [router, search, issuingBodyType, grantType, stageId, sectorId, includeExpired, aiEnabled, currentPage]);
+  }, [router, search, issuingBodyType, grantType, stageId, sectorId, amountBand, deadline, includeExpired, aiEnabled, currentPage]);
 
   useEffect(() => {
     updateURL();
@@ -142,12 +183,14 @@ export default function GrantsPage() {
     setGrantType("");
     setStageId("");
     setSectorId("");
+    setAmountBand("");
+    setDeadline("");
     setIncludeExpired(false);
     setAiEnabled(false);
     setCurrentPage(0);
   };
 
-  const hasActiveFilters = search || issuingBodyType || grantType || stageId || sectorId || includeExpired || aiEnabled;
+  const hasActiveFilters = search || issuingBodyType || grantType || stageId || sectorId || amountBand || deadline || includeExpired || aiEnabled;
 
   return (
     <div className="max-w-[1100px] mx-auto py-12 px-7">
@@ -237,6 +280,18 @@ export default function GrantsPage() {
             ...sectors.map((s) => ({ value: s.id!, label: s.name! })),
           ]}
           label="Sector"
+        />
+        <FilterSelect
+          value={amountBand}
+          onChange={(v) => handleFilterChange(setAmountBand, v)}
+          options={AMOUNT_BANDS}
+          label="Amount"
+        />
+        <FilterSelect
+          value={deadline}
+          onChange={(v) => handleFilterChange(setDeadline, v)}
+          options={DEADLINE_OPTIONS}
+          label="Deadline"
         />
 
         <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-muted">
@@ -394,128 +449,5 @@ function FilterSelect({
         </option>
       ))}
     </select>
-  );
-}
-
-// Grant card component
-function GrantCard({ grant }: { grant: GrantWithAi }) {
-  const formatDeadline = (deadline: string | undefined) => {
-    if (!deadline) return null;
-    const date = new Date(deadline);
-    return date.toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const isExpiringSoon = () => {
-    if (!grant.deadline || grant.expired) return false;
-    const deadline = new Date(grant.deadline);
-    const now = new Date();
-    const daysUntil = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntil <= 14 && daysUntil > 0;
-  };
-
-  return (
-    <Link
-      href={`/grants/${grant.id}`}
-      className="group block p-5 bg-paper-light border border-line hover:border-gold transition-colors"
-    >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div>
-          <p className="mono-label text-gold-dark mb-1">
-            {grant.type}
-          </p>
-          <h3 className="font-serif font-bold text-lg leading-tight tracking-[-0.02em] group-hover:text-gold-dark transition-colors line-clamp-2">
-            {grant.name}
-          </h3>
-        </div>
-        {grant.expired && (
-          <span className="shrink-0 px-2 py-0.5 text-xs font-medium bg-rose-light text-rose-dark">
-            Expired
-          </span>
-        )}
-        {isExpiringSoon() && !grant.expired && (
-          <span className="shrink-0 px-2 py-0.5 text-xs font-medium bg-gold-light text-gold-dark">
-            Ending soon
-          </span>
-        )}
-      </div>
-
-      {/* Issuing body */}
-      <p className="text-sm text-muted mb-3">
-        {grant.issuingBody}
-      </p>
-
-      {/* Summary */}
-      <p className="text-sm text-ink leading-relaxed line-clamp-3 mb-4">
-        {grant.summary}
-      </p>
-
-      {/* AI Reason */}
-      {grant.aiReason && (
-        <div className="mb-4 p-3 bg-gold-light/50 border-l-2 border-gold">
-          <p className="text-xs text-gold-dark font-medium mb-0.5">Why this is relevant</p>
-          <p className="text-sm text-ink">{grant.aiReason}</p>
-        </div>
-      )}
-
-      {/* Meta */}
-      <div className="flex flex-wrap gap-2 text-xs text-muted">
-        {grant.amountDisplay && (
-          <span className="px-2 py-1 bg-green-light text-green-dark">
-            {grant.amountDisplay}
-          </span>
-        )}
-        {grant.deadline && (
-          <span className={`px-2 py-1 ${grant.expired ? "bg-rose-light text-rose-dark" : "bg-paper"}`}>
-            Due: {formatDeadline(grant.deadline)}
-          </span>
-        )}
-      </div>
-
-      {/* Tags */}
-      {((grant.stages?.length ?? 0) > 0 || (grant.sectors?.length ?? 0) > 0) && (
-        <div className="mt-3 pt-3 border-t border-line flex flex-wrap gap-1.5">
-          {grant.stages?.slice(0, 2).map((stage) => (
-            <span key={stage} className="px-2 py-0.5 text-xs bg-paper border border-line text-muted">
-              {stage}
-            </span>
-          ))}
-          {grant.sectors?.slice(0, 2).map((sector) => (
-            <span key={sector} className="px-2 py-0.5 text-xs bg-paper border border-line text-muted">
-              {sector}
-            </span>
-          ))}
-          {((grant.stages?.length ?? 0) > 2 || (grant.sectors?.length ?? 0) > 2) && (
-            <span className="px-2 py-0.5 text-xs text-muted">
-              +{(grant.stages?.length ?? 0) + (grant.sectors?.length ?? 0) - 4} more
-            </span>
-          )}
-        </div>
-      )}
-    </Link>
-  );
-}
-
-// Skeleton loader
-function GrantCardSkeleton() {
-  return (
-    <div className="p-5 bg-paper-light border border-line animate-pulse">
-      <div className="h-3 w-16 bg-line mb-2" />
-      <div className="h-5 w-4/5 bg-line mb-3" />
-      <div className="h-4 w-1/3 bg-line mb-3" />
-      <div className="space-y-2 mb-4">
-        <div className="h-3 w-full bg-line" />
-        <div className="h-3 w-full bg-line" />
-        <div className="h-3 w-2/3 bg-line" />
-      </div>
-      <div className="flex gap-2">
-        <div className="h-6 w-20 bg-line" />
-        <div className="h-6 w-24 bg-line" />
-      </div>
-    </div>
   );
 }
