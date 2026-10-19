@@ -4,43 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/discover", label: "Discover", icon: HomeIcon },
-  { href: "/grants", label: "Opportunities", icon: GridIcon },
-  { href: "/mentors", label: "Mentors", icon: MentorsIcon },
-  { href: "/saved", label: "Saved", icon: BookmarkIcon },
-];
-
-export function MobileNav() {
-  const pathname = usePathname();
-
-  return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 bg-paper-light border-t border-line safe-area-pb">
-      <div className="h-full flex items-center justify-around px-4">
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center gap-1 py-2 px-3 min-w-[64px]",
-                isActive ? "text-green" : "text-muted"
-              )}
-            >
-              <Icon className="w-5 h-5" />
-              <span className="text-[10px] font-semibold">{item.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
-  );
-}
-
-// Icons (same as header)
+// Icons (defined before navItems to avoid hoisting issues in dev)
 function HomeIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -109,6 +73,42 @@ function BookmarkIcon({ className }: { className?: string }) {
     >
       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
     </svg>
+  );
+}
+
+const navItems = [
+  { href: "/discover", label: "Discover", icon: HomeIcon },
+  { href: "/grants", label: "Opportunities", icon: GridIcon },
+  { href: "/mentors", label: "Mentors", icon: MentorsIcon },
+  { href: "/saved", label: "Saved", icon: BookmarkIcon },
+];
+
+export function MobileNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 bg-paper-light border-t border-line safe-area-pb">
+      <div className="h-full flex items-center justify-around px-4">
+        {navItems.map((item) => {
+          const isActive =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center gap-1 py-2 px-3 min-w-[64px]",
+                isActive ? "text-green" : "text-muted"
+              )}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-[10px] font-semibold">{item.label}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 }
 

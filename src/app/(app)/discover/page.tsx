@@ -6,7 +6,8 @@ import { useAuth } from "@/lib/auth/context";
 import { getGrants } from "@/lib/api/grants";
 import { getChallenges } from "@/lib/api/challenges";
 import { getMentors } from "@/lib/api/mentors";
-import { Icon, OpportunityCard, MentorCard, SkeletonCard, EmptyState } from "@/components/ui";
+import { getSpotlight, type SpotlightFounder } from "@/lib/api/spotlight";
+import { Icon, OpportunityCard, MentorCard, SkeletonCard, EmptyState, SpotlightSection } from "@/components/ui";
 import type { GrantWithAi, ChallengeWithAi, MentorWithAi } from "@/lib/api/types";
 
 type OpportunityFilter = "all" | "grant" | "challenge";
@@ -24,6 +25,7 @@ export default function DiscoverPage() {
   const [grants, setGrants] = useState<GrantWithAi[]>([]);
   const [challenges, setChallenges] = useState<ChallengeWithAi[]>([]);
   const [mentors, setMentors] = useState<MentorWithAi[]>([]);
+  const [spotlight, setSpotlight] = useState<SpotlightFounder | null>(null);
   
   // Loading state
   const [isLoadingOpportunities, setIsLoadingOpportunities] = useState(true);
@@ -31,6 +33,15 @@ export default function DiscoverPage() {
   
   // Filter state
   const [opportunityFilter, setOpportunityFilter] = useState<OpportunityFilter>("all");
+
+  // Fetch spotlight on mount
+  useEffect(() => {
+    const fetchSpotlight = async () => {
+      const spotlightData = await getSpotlight();
+      setSpotlight(spotlightData);
+    };
+    fetchSpotlight();
+  }, []);
 
   // Fetch opportunities on mount
   useEffect(() => {
@@ -121,6 +132,9 @@ export default function DiscoverPage() {
           who&apos;ve been where you are. All curated for T-Hub founders like you, {user?.founderName?.split(" ")[0] || "Founder"}.
         </p>
       </section>
+
+      {/* FE-039: Spotlight Section - only show if spotlight exists */}
+      {spotlight && <SpotlightSection founder={spotlight} />}
 
       {/* FE-016: Stats */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
