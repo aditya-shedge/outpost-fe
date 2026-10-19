@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Manrope, IBM_Plex_Mono } from "next/font/google";
 import { AuthProvider } from "@/lib/auth/context";
+import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -38,6 +39,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-paper text-ink font-sans antialiased">
         <AuthProvider>{children}</AuthProvider>
+        <Toaster />
       </body>
     </html>
   );
