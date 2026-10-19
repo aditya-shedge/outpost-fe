@@ -17,12 +17,26 @@ export class ApiClientError extends Error {
   code: string;
   errors?: string[];
 
-  constructor(apiError: ApiError) {
-    super(apiError.message);
+  constructor(status: number, code: string, message: string, errors?: string[]);
+  constructor(apiError: ApiError);
+  constructor(
+    statusOrError: number | ApiError,
+    code?: string,
+    message?: string,
+    errors?: string[]
+  ) {
+    if (typeof statusOrError === "number") {
+      super(message || "An error occurred");
+      this.status = statusOrError;
+      this.code = code || "UNKNOWN_ERROR";
+      this.errors = errors;
+    } else {
+      super(statusOrError.message || "An error occurred");
+      this.status = statusOrError.status;
+      this.code = statusOrError.code || "UNKNOWN_ERROR";
+      this.errors = statusOrError.errors;
+    }
     this.name = "ApiClientError";
-    this.status = apiError.status;
-    this.code = apiError.code;
-    this.errors = apiError.errors;
   }
 }
 

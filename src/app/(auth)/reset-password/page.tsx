@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { authApi } from "@/lib/api/auth";
 import { ApiClientError } from "@/lib/api/client";
 import { Brand } from "@/components/ui/brand";
-import { Button, Input, Icon } from "@/components/ui";
+import { Button, Input, Icon, LoadingSpinner } from "@/components/ui";
 import { showToast } from "@/components/ui/toast";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
         if (err.code === "TOKEN_INVALID" || err.code === "TOKEN_EXPIRED") {
           setError("This reset link is invalid or has expired. Please request a new one.");
         } else {
-          setError(err.message);
+          setError(err.message || "Failed to reset password");
         }
       } else {
         setError("Failed to reset password. Please try again.");
@@ -81,29 +81,22 @@ export default function ResetPasswordPage() {
   // No token provided
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-paper p-8">
-        <div className="w-full max-w-[440px]">
-          <div className="mb-8">
-            <Brand />
-          </div>
-          <div className="bg-paper-light border border-line p-8 shadow-lg text-center">
-            <div className="size-12 mx-auto mb-4 rounded-full bg-rose-light flex items-center justify-center">
-              <Icon name="alert-circle" className="size-6 text-rose-dark" />
-            </div>
-            <h1 className="font-serif font-bold text-2xl tracking-tight text-ink mb-2">
-              Invalid reset link
-            </h1>
-            <p className="text-muted text-sm mb-6">
-              This password reset link is invalid or has expired.
-            </p>
-            <Link
-              href="/forgot-password"
-              className="inline-flex h-12 items-center justify-center gap-3 px-6 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258]"
-            >
-              Request a new link
-            </Link>
-          </div>
+      <div className="bg-paper-light border border-line p-8 shadow-lg text-center">
+        <div className="size-12 mx-auto mb-4 rounded-full bg-rose-light flex items-center justify-center">
+          <Icon name="alert-circle" className="size-6 text-rose-dark" />
         </div>
+        <h1 className="font-serif font-bold text-2xl tracking-tight text-ink mb-2">
+          Invalid reset link
+        </h1>
+        <p className="text-muted text-sm mb-6">
+          This password reset link is invalid or has expired.
+        </p>
+        <Link
+          href="/forgot-password"
+          className="inline-flex h-12 items-center justify-center gap-3 px-6 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258]"
+        >
+          Request a new link
+        </Link>
       </div>
     );
   }
@@ -111,29 +104,22 @@ export default function ResetPasswordPage() {
   // Success state
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-paper p-8">
-        <div className="w-full max-w-[440px]">
-          <div className="mb-8">
-            <Brand />
-          </div>
-          <div className="bg-paper-light border border-line p-8 shadow-lg text-center">
-            <div className="size-12 mx-auto mb-4 rounded-full bg-green-light flex items-center justify-center">
-              <Icon name="check" className="size-6 text-green-dark" />
-            </div>
-            <h1 className="font-serif font-bold text-2xl tracking-tight text-ink mb-2">
-              Password reset!
-            </h1>
-            <p className="text-muted text-sm mb-6">
-              Your password has been reset successfully. Redirecting to login...
-            </p>
-            <Link
-              href="/login"
-              className="inline-flex h-12 items-center justify-center gap-3 px-6 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258]"
-            >
-              Go to login
-            </Link>
-          </div>
+      <div className="bg-paper-light border border-line p-8 shadow-lg text-center">
+        <div className="size-12 mx-auto mb-4 rounded-full bg-green-light flex items-center justify-center">
+          <Icon name="check" className="size-6 text-green-dark" />
         </div>
+        <h1 className="font-serif font-bold text-2xl tracking-tight text-ink mb-2">
+          Password reset!
+        </h1>
+        <p className="text-muted text-sm mb-6">
+          Your password has been reset successfully. Redirecting to login...
+        </p>
+        <Link
+          href="/login"
+          className="inline-flex h-12 items-center justify-center gap-3 px-6 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258]"
+        >
+          Go to login
+        </Link>
       </div>
     );
   }
@@ -249,6 +235,34 @@ export default function ResetPasswordPage() {
         <Link href="/login" className="text-sm text-gold-dark hover:text-ink font-semibold">
           Back to login
         </Link>
+      </div>
+    </div>
+  );
+}
+
+function ResetPasswordLoading() {
+  return (
+    <div className="bg-paper-light border border-line p-8 shadow-lg text-center">
+      <div className="size-12 mx-auto mb-4 rounded-full bg-gold-light flex items-center justify-center">
+        <LoadingSpinner size="md" />
+      </div>
+      <h1 className="font-serif font-bold text-2xl tracking-tight text-ink mb-2">
+        Loading...
+      </h1>
+    </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-paper p-8">
+      <div className="w-full max-w-[440px]">
+        <div className="mb-8">
+          <Brand />
+        </div>
+        <Suspense fallback={<ResetPasswordLoading />}>
+          <ResetPasswordContent />
+        </Suspense>
       </div>
     </div>
   );

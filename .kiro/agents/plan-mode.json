@@ -8,8 +8,8 @@
   "allowedTools": ["read", "write", "code", "grep", "glob", "shell"],
   "toolsSettings": {
     "shell": {
-      "allowedCommands": ["git status", "git fetch"],
-      "deniedCommands": ["git commit .*", "git push .*"],
+      "allowedCommands": ["git status", "git fetch", "git commit .*", "git push .*"],
+      "deniedCommands": [],
       "autoAllowReadonly": true
     },
     "@git/git_status": {
