@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/context";
 import { ApiClientError } from "@/lib/api/client";
+import { Button, Input, Icon } from "@/components/ui";
 
 export default function LoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -19,6 +21,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
+      // Redirect is handled by the auth context based on user state
     } catch (err) {
       if (err instanceof ApiClientError) {
         if (err.code === "EMAIL_NOT_VERIFIED") {
@@ -46,10 +49,14 @@ export default function LoginPage() {
         Sign in to find your next opening.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {error && (
-          <div className="bg-rose-light border border-rose/20 text-rose-dark text-sm p-3">
-            {error}
+          <div 
+            className="bg-rose-light border border-rose/20 text-rose-dark text-sm p-3 flex items-start gap-2"
+            role="alert"
+          >
+            <Icon name="alert-circle" className="size-4 shrink-0 mt-0.5" />
+            <span>{error}</span>
           </div>
         )}
 
@@ -57,12 +64,11 @@ export default function LoginPage() {
           <label htmlFor="email" className="block text-sm font-medium text-ink mb-1.5">
             Email address
           </label>
-          <input
+          <Input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-11 px-3 border border-line bg-paper-light text-ink text-sm placeholder:text-placeholder focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20"
             placeholder="you@example.com"
             required
             autoComplete="email"
@@ -73,16 +79,26 @@ export default function LoginPage() {
           <label htmlFor="password" className="block text-sm font-medium text-ink mb-1.5">
             Password
           </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full h-11 px-3 border border-line bg-paper-light text-ink text-sm placeholder:text-placeholder focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20"
-            placeholder="••••••••••"
-            required
-            autoComplete="current-password"
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••••"
+              required
+              autoComplete="current-password"
+              className="pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              <Icon name={showPassword ? "eye-off" : "eye"} className="size-4" />
+            </button>
+          </div>
         </div>
 
         <div className="flex justify-end">
@@ -94,13 +110,15 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-12 flex items-center justify-center gap-3 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258] disabled:opacity-50 disabled:cursor-not-allowed"
+          loading={isSubmitting}
+          className="w-full"
+          size="lg"
         >
-          {isSubmitting ? "Signing in..." : "Sign in"}
-        </button>
+          Sign in
+        </Button>
       </form>
 
       <div className="mt-6 pt-6 border-t border-line text-center">

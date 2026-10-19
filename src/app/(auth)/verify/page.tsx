@@ -6,6 +6,8 @@ import Link from "next/link";
 import { authApi } from "@/lib/api/auth";
 import { ApiClientError } from "@/lib/api/client";
 import { Brand } from "@/components/ui/brand";
+import { Icon, LoadingSpinner } from "@/components/ui";
+import { showToast } from "@/components/ui/toast";
 
 type VerifyStatus = "loading" | "success" | "error" | "no-token";
 
@@ -31,6 +33,7 @@ export default function VerifyPage() {
       try {
         await authApi.verify({ token });
         setStatus("success");
+        showToast.success("Email verified successfully!");
         // Redirect to login after a short delay
         setTimeout(() => {
           router.push("/login");
@@ -64,8 +67,8 @@ export default function VerifyPage() {
         <div className="bg-paper-light border border-line p-8 shadow-lg text-center">
           {status === "loading" && (
             <>
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gold-light flex items-center justify-center animate-pulse">
-                <LoadingIcon />
+              <div className="size-12 mx-auto mb-4 rounded-full bg-gold-light flex items-center justify-center">
+                <LoadingSpinner size="md" />
               </div>
               <h1 className="font-serif font-bold text-2xl tracking-tight text-ink mb-2">
                 Verifying your email
@@ -78,8 +81,8 @@ export default function VerifyPage() {
 
           {status === "success" && (
             <>
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-green-light flex items-center justify-center">
-                <CheckIcon />
+              <div className="size-12 mx-auto mb-4 rounded-full bg-green-light flex items-center justify-center">
+                <Icon name="check" className="size-6 text-green-dark" />
               </div>
               <h1 className="font-serif font-bold text-2xl tracking-tight text-ink mb-2">
                 Email verified!
@@ -89,7 +92,7 @@ export default function VerifyPage() {
               </p>
               <Link
                 href="/login"
-                className="inline-flex h-12 items-center justify-center gap-3 px-6 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258]"
+                className="inline-flex h-12 items-center justify-center px-6 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258]"
               >
                 Go to login
               </Link>
@@ -98,8 +101,8 @@ export default function VerifyPage() {
 
           {showError && (
             <>
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-rose-light flex items-center justify-center">
-                <ErrorIcon />
+              <div className="size-12 mx-auto mb-4 rounded-full bg-rose-light flex items-center justify-center">
+                <Icon name="alert-circle" className="size-6 text-rose-dark" />
               </div>
               <h1 className="font-serif font-bold text-2xl tracking-tight text-ink mb-2">
                 Verification failed
@@ -108,7 +111,7 @@ export default function VerifyPage() {
               <div className="space-y-3">
                 <Link
                   href="/verify-email"
-                  className="block w-full h-12 flex items-center justify-center gap-3 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258]"
+                  className="flex w-full h-12 items-center justify-center bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258]"
                 >
                   Request new verification link
                 </Link>
@@ -124,61 +127,5 @@ export default function VerifyPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function LoadingIcon() {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-gold-dark animate-spin"
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-green-dark"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
-function ErrorIcon() {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-rose-dark"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="15" y1="9" x2="9" y2="15" />
-      <line x1="9" y1="9" x2="15" y2="15" />
-    </svg>
   );
 }
