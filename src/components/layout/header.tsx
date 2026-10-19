@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Brand } from "@/components/ui/brand";
 import { useAuth } from "@/lib/auth/context";
 import { cn } from "@/lib/utils";
@@ -14,7 +15,11 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Get user initials
   const initials = user?.founderName
@@ -25,6 +30,42 @@ export function Header() {
         .toUpperCase()
         .slice(0, 2)
     : "?";
+
+  // Close menu on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close menu on Escape
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        buttonRef.current?.focus();
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [menuOpen]);
+
+  const handleLogout = async () => {
+    setMenuOpen(false);
+    await logout();
+    router.push("/login");
+  };
 
   return (
     <header className="sticky top-0 z-50 h-16 border-b border-line bg-paper-light">
@@ -66,13 +107,72 @@ export function Header() {
             </kbd>
           </div>
 
-          {/* User Avatar */}
-          <button
-            className="w-9 h-9 rounded-full bg-green flex items-center justify-center text-sm font-bold text-white"
-            aria-label="User menu"
-          >
-            {initials}
-          </button>
+          {/* User Menu */}
+          <div className="relative">
+            <button
+              ref={buttonRef}
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="w-9 h-9 rounded-full bg-green flex items-center justify-center text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2"
+              aria-label="User menu"
+              aria-expanded={menuOpen}
+              aria-haspopup="true"
+            >
+              {initials}
+            </button>
+            
+            {menuOpen && (
+              <div
+                ref={menuRef}
+                className="absolute right-0 mt-2 w-56 bg-white border border-line shadow-lg py-1 z-50"
+                role="menu"
+                aria-orientation="vertical"
+              >
+                {/* User info */}
+                <div className="px-4 py-3 border-b border-line">
+                  <p className="text-sm font-medium text-ink truncate">
+                    {user?.founderName || "Founder"}
+                  </p>
+                  <p className="text-xs text-muted truncate">
+                    {user?.email}
+                  </p>
+                </div>
+                
+                {/* Menu items */}
+                <div className="py-1">
+                  <Link
+                    href="/profile"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-ink hover:bg-paper transition-colors"
+                    role="menuitem"
+                  >
+                    <UserIcon className="w-4 h-4 text-muted" />
+                    Profile
+                  </Link>
+                  <Link
+                    href="/profile/security"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-ink hover:bg-paper transition-colors"
+                    role="menuitem"
+                  >
+                    <SettingsIcon className="w-4 h-4 text-muted" />
+                    Settings
+                  </Link>
+                </div>
+                
+                {/* Logout */}
+                <div className="border-t border-line py-1">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-paper transition-colors"
+                    role="menuitem"
+                  >
+                    <LogoutIcon className="w-4 h-4" />
+                    Log out
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
@@ -148,6 +248,58 @@ function SearchIcon({ className }: { className?: string }) {
     >
       <circle cx="11" cy="11" r="8" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  );
+}
+
+function UserIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function SettingsIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
+function LogoutIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   );
 }
