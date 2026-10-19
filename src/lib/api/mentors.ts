@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { MentorWithAi, MentorDetailResponse, PaginatedResponse, PageMetadata } from "./types";
+import type { MentorWithAi, MentorDetailResponse, MentorApplicationRequest, PaginatedResponse, PageMetadata } from "./types";
 
 export interface MentorsListParams {
   page?: number;
@@ -56,4 +56,11 @@ export async function getMentors(
  */
 export async function getMentorById(id: string): Promise<MentorDetailResponse> {
   return api.get<MentorDetailResponse>(`/api/v1/mentors/${id}`);
+}
+
+/**
+ * Submit mentor application
+ */
+export async function applyMentor(application: MentorApplicationRequest): Promise<void> {
+  return api.post<void>("/api/v1/mentors/apply", application);
 }
