@@ -70,14 +70,23 @@ export default function AuthLayout({
       </div>
 
       {/* Right side - Auth form */}
-      <div className="flex items-center justify-center p-8 lg:p-12">
-        <div className="w-full max-w-[440px]">
-          {/* Mobile brand - only shown on small screens */}
-          <div className="lg:hidden mb-8">
-            <Brand />
+      <div className="flex flex-col min-h-screen lg:min-h-0">
+        <div className="flex-1 flex items-center justify-center p-8 lg:p-12">
+          <div className="w-full max-w-[440px]">
+            {/* Mobile brand - only shown on small screens */}
+            <div className="lg:hidden mb-8">
+              <Brand />
+            </div>
+            
+            {children}
           </div>
-          
-          {children}
+        </div>
+        
+        {/* Footer - visible on mobile */}
+        <div className="lg:hidden py-6 text-center">
+          <p className="text-muted text-xs">
+            Exclusive to the T-Hub founder community
+          </p>
         </div>
       </div>
     </div>
