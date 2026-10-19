@@ -103,6 +103,15 @@ export default function GrantDetailPage() {
 
   return (
     <div className="max-w-[900px] mx-auto py-12 px-7">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-2 text-sm text-muted mb-6">
+        <Link href="/grants" className="hover:text-ink transition-colors">
+          Grants
+        </Link>
+        <span>/</span>
+        <span className="text-ink truncate max-w-[300px]">{grant.name}</span>
+      </nav>
+
       {/* Back navigation */}
       <button
         onClick={() => router.back()}
