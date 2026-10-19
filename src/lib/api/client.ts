@@ -172,7 +172,18 @@ export async function apiClient<T>(
     return undefined as T;
   }
 
-  return response.json();
+  // Handle empty response body
+  const text = await response.text();
+  if (!text) {
+    return undefined as T;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    // If response isn't JSON but we got here, return undefined
+    return undefined as T;
+  }
 }
 
 // Convenience methods

@@ -126,6 +126,12 @@ export default function VerifyEmailPage() {
       </Button>
 
       <div className="mt-6 pt-6 border-t border-line">
+        <p className="text-muted text-sm mb-3">
+          Already verified?{" "}
+          <Link href="/login" className="text-gold-dark hover:text-ink font-semibold">
+            Back to login
+          </Link>
+        </p>
         <p className="text-muted text-sm">
           Wrong email?{" "}
           <Link href="/signup" className="text-gold-dark hover:text-ink font-semibold">
