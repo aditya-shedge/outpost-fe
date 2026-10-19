@@ -8,6 +8,10 @@ export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 export { Skeleton, SkeletonCard, SkeletonText, SkeletonAvatar } from "./skeleton";
 export { GoogleButton } from "./google-button";
 
+// Feature cards
+export { OpportunityCard } from "./opportunity-card";
+export { MentorCard } from "./mentor-card";
+
 // Loading and error states
 export { LoadingSpinner } from "./loading-spinner";
 export { PageLoader } from "./page-loader";
