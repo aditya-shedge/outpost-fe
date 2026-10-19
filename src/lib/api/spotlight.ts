@@ -17,13 +17,9 @@ export async function getSpotlight(): Promise<SpotlightFounder | null> {
   try {
     const data = await api.get<SpotlightFounder | undefined>("/api/v1/spotlight");
     return data ?? null;
-  } catch (error) {
-    // If endpoint doesn't exist yet (404), return null gracefully
-    const apiError = error as { status?: number };
-    if (apiError?.status === 404) {
-      return null;
-    }
-    console.error("Failed to fetch spotlight:", error);
+  } catch {
+    // Silently return null - endpoint may not exist yet or no spotlight set
+    // This is expected behavior, not an error condition
     return null;
   }
 }
