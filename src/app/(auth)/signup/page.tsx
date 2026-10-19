@@ -4,12 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/context";
 import { ApiClientError } from "@/lib/api/client";
+import { Button, Input, Icon } from "@/components/ui";
 
 export default function SignupPage() {
   const { signup } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +32,9 @@ export default function SignupPage() {
       errors.password = "Password must be at least 10 characters";
     }
 
-    if (password !== confirmPassword) {
+    if (!confirmPassword) {
+      errors.confirmPassword = "Please confirm your password";
+    } else if (password !== confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
     }
 
@@ -73,10 +78,14 @@ export default function SignupPage() {
         Use your email to get started.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {error && (
-          <div className="bg-rose-light border border-rose/20 text-rose-dark text-sm p-3">
-            {error}
+          <div 
+            className="bg-rose-light border border-rose/20 text-rose-dark text-sm p-3 flex items-start gap-2"
+            role="alert"
+          >
+            <Icon name="alert-circle" className="size-4 shrink-0 mt-0.5" />
+            <span>{error}</span>
           </div>
         )}
 
@@ -84,7 +93,7 @@ export default function SignupPage() {
           <label htmlFor="email" className="block text-sm font-medium text-ink mb-1.5">
             Email address
           </label>
-          <input
+          <Input
             id="email"
             type="email"
             value={email}
@@ -92,15 +101,16 @@ export default function SignupPage() {
               setEmail(e.target.value);
               setFieldErrors((prev) => ({ ...prev, email: "" }));
             }}
-            className={`w-full h-11 px-3 border bg-paper-light text-ink text-sm placeholder:text-placeholder focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 ${
-              fieldErrors.email ? "border-rose" : "border-line"
-            }`}
+            error={!!fieldErrors.email}
             placeholder="you@example.com"
-            required
             autoComplete="email"
+            aria-describedby={fieldErrors.email ? "email-error" : undefined}
+            aria-invalid={!!fieldErrors.email}
           />
           {fieldErrors.email && (
-            <p className="mt-1 text-sm text-rose-dark">{fieldErrors.email}</p>
+            <p id="email-error" className="mt-1.5 text-sm text-rose-dark" role="alert">
+              {fieldErrors.email}
+            </p>
           )}
         </div>
 
@@ -108,23 +118,39 @@ export default function SignupPage() {
           <label htmlFor="password" className="block text-sm font-medium text-ink mb-1.5">
             Password
           </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setFieldErrors((prev) => ({ ...prev, password: "" }));
-            }}
-            className={`w-full h-11 px-3 border bg-paper-light text-ink text-sm placeholder:text-placeholder focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 ${
-              fieldErrors.password ? "border-rose" : "border-line"
-            }`}
-            placeholder="At least 10 characters"
-            required
-            autoComplete="new-password"
-          />
-          {fieldErrors.password && (
-            <p className="mt-1 text-sm text-rose-dark">{fieldErrors.password}</p>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, password: "" }));
+              }}
+              error={!!fieldErrors.password}
+              placeholder="At least 10 characters"
+              autoComplete="new-password"
+              className="pr-10"
+              aria-describedby={fieldErrors.password ? "password-error" : "password-hint"}
+              aria-invalid={!!fieldErrors.password}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              <Icon name={showPassword ? "eye-off" : "eye"} className="size-4" />
+            </button>
+          </div>
+          {fieldErrors.password ? (
+            <p id="password-error" className="mt-1.5 text-sm text-rose-dark" role="alert">
+              {fieldErrors.password}
+            </p>
+          ) : (
+            <p id="password-hint" className="mt-1.5 text-xs text-muted">
+              Must be at least 10 characters
+            </p>
           )}
         </div>
 
@@ -132,33 +158,47 @@ export default function SignupPage() {
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-ink mb-1.5">
             Confirm password
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              setFieldErrors((prev) => ({ ...prev, confirmPassword: "" }));
-            }}
-            className={`w-full h-11 px-3 border bg-paper-light text-ink text-sm placeholder:text-placeholder focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 ${
-              fieldErrors.confirmPassword ? "border-rose" : "border-line"
-            }`}
-            placeholder="Confirm your password"
-            required
-            autoComplete="new-password"
-          />
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, confirmPassword: "" }));
+              }}
+              error={!!fieldErrors.confirmPassword}
+              placeholder="Confirm your password"
+              autoComplete="new-password"
+              className="pr-10"
+              aria-describedby={fieldErrors.confirmPassword ? "confirm-error" : undefined}
+              aria-invalid={!!fieldErrors.confirmPassword}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink transition-colors"
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+            >
+              <Icon name={showConfirmPassword ? "eye-off" : "eye"} className="size-4" />
+            </button>
+          </div>
           {fieldErrors.confirmPassword && (
-            <p className="mt-1 text-sm text-rose-dark">{fieldErrors.confirmPassword}</p>
+            <p id="confirm-error" className="mt-1.5 text-sm text-rose-dark" role="alert">
+              {fieldErrors.confirmPassword}
+            </p>
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-12 flex items-center justify-center gap-3 bg-ink text-paper-light font-semibold text-sm border border-ink transition-all hover:bg-[#304258] disabled:opacity-50 disabled:cursor-not-allowed"
+          loading={isSubmitting}
+          className="w-full"
+          size="lg"
         >
-          {isSubmitting ? "Creating account..." : "Create account"}
-        </button>
+          Create account
+        </Button>
       </form>
 
       <div className="mt-6 pt-6 border-t border-line text-center">
