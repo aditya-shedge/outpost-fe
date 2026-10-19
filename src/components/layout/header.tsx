@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Brand } from "@/components/ui/brand";
 import { useAuth } from "@/lib/auth/context";
 import { cn } from "@/lib/utils";
+import { SearchModal } from "@/components/search/search-modal";
 
 const navItems = [
   { href: "/discover", label: "Discover", icon: HomeIcon },
@@ -18,6 +19,7 @@ export function Header() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -61,6 +63,18 @@ export function Header() {
     }
   }, [menuOpen]);
 
+  // Global keyboard shortcut for search (⌘K / Ctrl+K)
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleLogout = async () => {
     setMenuOpen(false);
     await logout();
@@ -68,7 +82,8 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 h-16 border-b border-line bg-paper-light">
+    <>
+      <header className="sticky top-0 z-50 h-16 border-b border-line bg-paper-light">
       <div className="max-w-[1440px] mx-auto h-full flex items-center justify-between px-6 lg:px-10">
         <Brand />
 
@@ -99,13 +114,16 @@ export function Header() {
 
         <div className="flex items-center gap-4">
           {/* Search Bar - Desktop only */}
-          <div className="hidden lg:flex items-center gap-2 h-9 px-3 bg-paper border border-line text-muted text-sm">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="hidden lg:flex items-center gap-2 h-9 px-3 bg-paper border border-line text-muted text-sm hover:border-ink/30 transition-colors"
+          >
             <SearchIcon className="w-4 h-4" />
             <span>Search</span>
             <kbd className="ml-2 px-1.5 py-0.5 text-[10px] font-mono bg-paper-light border border-line">
               ⌘K
             </kbd>
-          </div>
+          </button>
 
           {/* User Menu */}
           <div className="relative">
@@ -176,6 +194,10 @@ export function Header() {
         </div>
       </div>
     </header>
+
+      {/* Search Modal */}
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 }
 
