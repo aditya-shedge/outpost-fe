@@ -6,6 +6,7 @@ export { Select } from "./select";
 export { Badge, DotBadge } from "./badge";
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./card";
 export { Skeleton, SkeletonCard, SkeletonText, SkeletonAvatar } from "./skeleton";
+export { GoogleButton } from "./google-button";
 
 // Loading and error states
 export { LoadingSpinner } from "./loading-spinner";

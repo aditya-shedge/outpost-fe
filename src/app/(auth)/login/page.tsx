@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth/context";
 import { ApiClientError } from "@/lib/api/client";
 import { Button, Input, Icon } from "@/components/ui";
+import { GoogleButton } from "@/components/ui/google-button";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -48,6 +49,19 @@ export default function LoginPage() {
       <p className="text-muted text-sm mb-8">
         Sign in to find your next opening.
       </p>
+
+      {/* Google OAuth Button */}
+      <GoogleButton mode="login" className="mb-6" />
+
+      {/* Divider */}
+      <div className="relative mb-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-line" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-paper-light px-2 text-muted">or continue with email</span>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {error && (
