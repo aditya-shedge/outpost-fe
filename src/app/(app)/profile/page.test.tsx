@@ -32,6 +32,18 @@ jest.mock("@/lib/api/me", () => ({
   },
 }));
 
+// Mock the lookups API
+jest.mock("@/lib/api/lookups", () => ({
+  getStages: jest.fn().mockResolvedValue([
+    { id: "stage-1", name: "Ideation" },
+    { id: "stage-2", name: "MVP" },
+  ]),
+  getSectors: jest.fn().mockResolvedValue([
+    { id: "sector-1", name: "FinTech" },
+    { id: "sector-2", name: "HealthTech" },
+  ]),
+}));
+
 describe("ProfilePage", () => {
   it("renders profile information", async () => {
     render(<ProfilePage />);
@@ -51,6 +63,15 @@ describe("ProfilePage", () => {
 
     await waitFor(() => {
       expect(screen.getByText("JD")).toBeInTheDocument();
+    });
+  });
+
+  it("displays stage and sector names from lookups", async () => {
+    render(<ProfilePage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Ideation")).toBeInTheDocument();
+      expect(screen.getByText("FinTech")).toBeInTheDocument();
     });
   });
 

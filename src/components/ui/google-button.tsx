@@ -1,65 +1,188 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { authApi } from "@/lib/api/auth";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential: string }) => void;
+            auto_select?: boolean;
+            ux_mode?: "popup" | "redirect";
+            context?: "signin" | "signup" | "use";
+          }) => void;
+          prompt: (callback?: (notification: {
+            isNotDisplayed: () => boolean;
+            isSkippedMoment: () => boolean;
+            getNotDisplayedReason: () => string;
+          }) => void) => void;
+          renderButton: (
+            element: HTMLElement,
+            config: {
+              theme?: "outline" | "filled_blue" | "filled_black";
+              size?: "large" | "medium" | "small";
+              type?: "standard" | "icon";
+              text?: "signin_with" | "signup_with" | "continue_with" | "signin";
+              width?: number;
+              shape?: "rectangular" | "pill" | "circle" | "square";
+            }
+          ) => void;
+          cancel: () => void;
+        };
+        oauth2: {
+          initCodeClient: (config: {
+            client_id: string;
+            scope: string;
+            callback: (response: { code?: string; error?: string }) => void;
+            ux_mode?: "popup" | "redirect";
+          }) => {
+            requestCode: () => void;
+          };
+          initTokenClient: (config: {
+            client_id: string;
+            scope: string;
+            callback: (response: { access_token?: string; error?: string }) => void;
+          }) => {
+            requestAccessToken: () => void;
+          };
+        };
+      };
+    };
+  }
+}
 
 interface GoogleButtonProps {
-  onClick?: () => void;
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
   disabled?: boolean;
   className?: string;
   mode?: "login" | "signup";
 }
 
 export function GoogleButton({
-  onClick,
+  onSuccess,
+  onError,
   disabled = false,
   className,
   mode = "login",
 }: GoogleButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const router = useRouter();
+  const buttonRef = useRef<HTMLDivElement>(null);
 
-  const handleClick = async () => {
-    if (disabled || isLoading) return;
+  const handleCredentialResponse = useCallback(async (response: { credential: string }) => {
     setIsLoading(true);
-    
     try {
-      // Redirect to backend OAuth endpoint
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      window.location.href = `${apiUrl}/oauth2/authorization/google`;
-    } catch {
+      await authApi.googleOAuth({ idToken: response.credential });
+      onSuccess?.();
+      router.push("/discover");
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error("Google sign-in failed");
+      toast.error(err.message);
+      onError?.(err);
       setIsLoading(false);
     }
-    
-    onClick?.();
-  };
+  }, [onSuccess, onError, router]);
 
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn("NEXT_PUBLIC_GOOGLE_CLIENT_ID is not set");
+      return;
+    }
+
+    // Load Google Identity Services script
+    const existingScript = document.getElementById("google-identity-script");
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.id = "google-identity-script";
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      script.onload = () => setIsScriptLoaded(true);
+      document.body.appendChild(script);
+    } else if (window.google?.accounts?.id) {
+      setIsScriptLoaded(true);
+    } else {
+      // Script exists but not loaded yet, wait for it
+      existingScript.addEventListener("load", () => setIsScriptLoaded(true));
+    }
+  }, []);
+
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!isScriptLoaded || !window.google?.accounts?.id || !clientId || !buttonRef.current) return;
+
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: handleCredentialResponse,
+      ux_mode: "popup",
+      context: mode === "signup" ? "signup" : "signin",
+    });
+
+    // Render Google's button inside our container
+    window.google.accounts.id.renderButton(buttonRef.current, {
+      theme: "outline",
+      size: "large",
+      type: "standard",
+      text: mode === "signup" ? "continue_with" : "signin_with",
+      width: buttonRef.current.offsetWidth,
+      shape: "rectangular",
+    });
+  }, [isScriptLoaded, handleCredentialResponse, mode]);
+
+  // If script not loaded or no client ID, show our custom button
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  if (!clientId || !isScriptLoaded) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          if (!clientId) {
+            toast.error("Google Sign-In is not configured");
+          }
+        }}
+        disabled={disabled || isLoading}
+        className={cn(
+          "w-full h-12 flex items-center justify-center gap-3",
+          "bg-white text-ink font-medium text-sm",
+          "border border-line",
+          "transition-all hover:bg-gray-50 hover:border-ink/30",
+          "disabled:opacity-50 disabled:cursor-not-allowed",
+          className
+        )}
+      >
+        {isLoading ? (
+          <div className="size-5 border-2 border-ink/20 border-t-ink rounded-full animate-spin" />
+        ) : (
+          <GoogleIcon />
+        )}
+        <span>
+          {isLoading
+            ? "Signing in..."
+            : !clientId
+            ? "Google Sign-In unavailable"
+            : "Loading..."}
+        </span>
+      </button>
+    );
+  }
+
+  // Show Google's rendered button
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={disabled || isLoading}
-      className={cn(
-        "w-full h-12 flex items-center justify-center gap-3",
-        "bg-white text-ink font-medium text-sm",
-        "border border-line",
-        "transition-all hover:bg-gray-50 hover:border-ink/30",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        className
-      )}
-    >
-      {isLoading ? (
-        <div className="size-5 border-2 border-ink/20 border-t-ink rounded-full animate-spin" />
-      ) : (
-        <GoogleIcon />
-      )}
-      <span>
-        {isLoading
-          ? "Redirecting..."
-          : mode === "signup"
-          ? "Continue with Google"
-          : "Sign in with Google"}
-      </span>
-    </button>
+    <div 
+      ref={buttonRef} 
+      className={cn("w-full h-12 flex items-center justify-center", className)}
+      style={{ minHeight: "48px" }}
+    />
   );
 }
 

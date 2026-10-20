@@ -202,4 +202,91 @@ export const api = {
 
   delete: <T>(endpoint: string, options?: RequestOptions) =>
     apiClient<T>(endpoint, { ...options, method: "DELETE" }),
+
+  /**
+   * Upload a file using multipart/form-data
+   * Used for pitch deck uploads
+   */
+  upload: async <T>(endpoint: string, formData: FormData): Promise<T> => {
+    const accessToken = getAccessToken();
+    const headers: HeadersInit = {};
+    
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    // Note: Don't set Content-Type - browser will set it with boundary for multipart
+
+    const url = `${API_BASE_URL}${endpoint}`;
+    let response = await fetch(url, {
+      method: "PUT",
+      headers,
+      body: formData,
+    });
+
+    // Handle 401 - try to refresh token and retry
+    if (response.status === 401) {
+      const refreshed = await handleTokenRefresh();
+      if (refreshed) {
+        const newAccessToken = getAccessToken();
+        if (newAccessToken) {
+          headers["Authorization"] = `Bearer ${newAccessToken}`;
+          response = await fetch(url, {
+            method: "PUT",
+            headers,
+            body: formData,
+          });
+        }
+      } else {
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+        throw new ApiClientError({
+          status: 401,
+          error: "Unauthorized",
+          code: "UNAUTHORIZED",
+          message: "Session expired. Please log in again.",
+        });
+      }
+    }
+
+    // Handle non-OK responses
+    if (!response.ok) {
+      let errorData: ApiError;
+      try {
+        errorData = await response.json();
+      } catch {
+        // Specific error messages for file upload errors
+        if (response.status === 413) {
+          errorData = {
+            status: 413,
+            error: "Payload Too Large",
+            code: "FILE_TOO_LARGE",
+            message: "File exceeds the 10 MB size limit",
+          };
+        } else if (response.status === 415) {
+          errorData = {
+            status: 415,
+            error: "Unsupported Media Type",
+            code: "INVALID_FILE_TYPE",
+            message: "Only PDF files are allowed",
+          };
+        } else {
+          errorData = {
+            status: response.status,
+            error: response.statusText,
+            code: "UPLOAD_ERROR",
+            message: "Failed to upload file",
+          };
+        }
+      }
+      throw new ApiClientError(errorData);
+    }
+
+    const text = await response.text();
+    if (!text) {
+      return undefined as T;
+    }
+
+    return JSON.parse(text);
+  },
 };

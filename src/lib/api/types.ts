@@ -54,6 +54,36 @@ export type OfferRequest = components["schemas"]["OfferRequest"];
 // Pagination
 export type PageMetadata = components["schemas"]["PageMetadata"];
 
+// Pitch Deck - manually defined (not in generated types yet)
+export interface PitchDeckResponse {
+  fileName?: string;
+  sizeBytes?: number;
+  uploadedAt?: string;
+}
+
+// ============================================
+// Enriched Profile types (FE-045)
+// These types are for bio + links editing
+// Backend endpoint: PATCH /api/v1/me/profile (OP-053)
+// ============================================
+
+export type LinkType = "LINKEDIN" | "X" | "OTHER";
+
+export interface FounderLink {
+  type: LinkType;
+  url: string;
+}
+
+export interface EnrichedProfileRequest {
+  bio?: string | null;
+  links?: FounderLink[] | null;
+}
+
+export interface EnrichedProfile {
+  bio?: string | null;
+  links?: FounderLink[] | null;
+}
+
 // ============================================
 // Convenience type aliases
 // ============================================

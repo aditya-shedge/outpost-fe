@@ -16,6 +16,10 @@ export { ChallengeCard, ChallengeCardSkeleton } from "./challenge-card";
 export { SpotlightSection } from "./spotlight-section";
 export { BenefitCard, BenefitCardSkeleton } from "./benefit-card";
 
+// Profile components (FE-045, FE-046)
+export { PitchDeckUpload } from "./pitch-deck-upload";
+export { BioLinksEditor } from "./bio-links-editor";
+
 // Loading and error states
 export { LoadingSpinner } from "./loading-spinner";
 export { PageLoader } from "./page-loader";

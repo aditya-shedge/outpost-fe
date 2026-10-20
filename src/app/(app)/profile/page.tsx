@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/context";
 import { meApi } from "@/lib/api/me";
-import { Icon, PageLoader, ApiErrorDisplay, showToast } from "@/components/ui";
-import type { FounderResponse, IdentityResponse } from "@/lib/api/types";
+import { getStages, getSectors } from "@/lib/api/lookups";
+import { Icon, PageLoader, ApiErrorDisplay } from "@/components/ui";
+import type { IdentityResponse, LookupResponse } from "@/lib/api/types";
 
 export default function ProfilePage() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const [identities, setIdentities] = useState<IdentityResponse[]>([]);
+  const [stages, setStages] = useState<LookupResponse[]>([]);
+  const [sectors, setSectors] = useState<LookupResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -17,8 +20,14 @@ export default function ProfilePage() {
     async function fetchData() {
       try {
         setLoading(true);
-        const identitiesData = await meApi.getIdentities();
+        const [identitiesData, stagesData, sectorsData] = await Promise.all([
+          meApi.getIdentities(),
+          getStages(),
+          getSectors(),
+        ]);
         setIdentities(identitiesData);
+        setStages(stagesData);
+        setSectors(sectorsData);
       } catch (err) {
         setError(err instanceof Error ? err : new Error("Failed to load profile"));
       } finally {
@@ -53,6 +62,10 @@ export default function ProfilePage() {
         .toUpperCase()
         .slice(0, 2)
     : "?";
+
+  // Look up stage and sector names
+  const stageName = stages.find((s) => s.id === user.stageId)?.name;
+  const sectorName = sectors.find((s) => s.id === user.sectorId)?.name;
 
   // Calculate profile completeness
   const fields = [
@@ -117,8 +130,8 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <ProfileField label="Founder Name" value={user.founderName} />
             <ProfileField label="Startup Name" value={user.startupName} />
-            <ProfileField label="Stage" value={user.stageId ? "Set" : null} />
-            <ProfileField label="Sector" value={user.sectorId ? "Set" : null} />
+            <ProfileField label="Stage" value={stageName} />
+            <ProfileField label="Sector" value={sectorName} />
           </div>
         </section>
 
