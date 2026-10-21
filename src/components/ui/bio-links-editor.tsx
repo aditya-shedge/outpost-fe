@@ -90,7 +90,8 @@ export const BioLinksEditor = forwardRef<BioLinksEditorRef, BioLinksEditorProps>
   };
 
   const save = async (): Promise<boolean> => {
-    if (!hasChangesState) return true; // Nothing to save
+    // Always attempt to save if there are links or bio
+    // (hasChangesState may be stale in closure)
     if (!validate()) return false;
 
     try {
