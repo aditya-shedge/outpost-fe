@@ -1,45 +1,10 @@
-import { test, expect, mockUser } from "./fixtures";
+import { test, expect, hasTestCredentials, loginUser } from "./fixtures";
 
 test.describe("Navigation", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await context.addInitScript(() => {
-      window.localStorage.setItem("outpost_access_token", "mock-access-token");
-      window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
-    });
+  test.skip(!hasTestCredentials, "Test credentials not configured");
 
-    // Mock /me endpoint for auth
-    await page.route("**/**/api/v1/me", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(mockUser),
-      });
-    });
-
-    await page.route("**/**/api/v1/me/identities", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify([]),
-      });
-    });
-
-    // Mock spotlight and challenges for discover page
-    await page.route("**/**/api/v1/spotlight", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(null),
-      });
-    });
-
-    await page.route("**/**/api/v1/challenges*", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } }),
-      });
-    });
+  test.beforeEach(async ({ page }) => {
+    await loginUser(page, process.env.OUTPOST_TEST_EMAIL!, process.env.OUTPOST_TEST_PASSWORD!);
   });
 
   test("navigation links are visible on desktop", async ({ page }) => {
@@ -82,45 +47,10 @@ test.describe("Navigation", () => {
 });
 
 test.describe("Mobile Navigation", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await context.addInitScript(() => {
-      window.localStorage.setItem("outpost_access_token", "mock-access-token");
-      window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
-    });
+  test.skip(!hasTestCredentials, "Test credentials not configured");
 
-    // Mock /me endpoint for auth
-    await page.route("**/**/api/v1/me", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(mockUser),
-      });
-    });
-
-    await page.route("**/**/api/v1/me/identities", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify([]),
-      });
-    });
-
-    // Mock spotlight and challenges
-    await page.route("**/**/api/v1/spotlight", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(null),
-      });
-    });
-
-    await page.route("**/**/api/v1/challenges*", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } }),
-      });
-    });
+  test.beforeEach(async ({ page }) => {
+    await loginUser(page, process.env.OUTPOST_TEST_EMAIL!, process.env.OUTPOST_TEST_PASSWORD!);
   });
 
   test("shows navigation on mobile", async ({ page }) => {
@@ -128,7 +58,7 @@ test.describe("Mobile Navigation", () => {
     await page.goto("/discover");
     await page.waitForLoadState("networkidle");
 
-    // Mobile bottom navigation should be visible (the one with fixed bottom-0)
+    // Mobile bottom navigation should be visible
     await expect(page.locator("nav.md\\:hidden")).toBeVisible({ timeout: 10000 });
   });
 });

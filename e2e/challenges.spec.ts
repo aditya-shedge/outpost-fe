@@ -1,12 +1,11 @@
-import { test, expect } from "./fixtures";
+import { test, expect, hasTestCredentials, loginUser } from "./fixtures";
 
-// Skip: Backend /api/v1/challenges returns 500 error
+// Skip: Backend /api/v1/challenges returns 500 error due to bad enum data
 test.describe.skip("Challenges Flow", () => {
-  test.beforeEach(async ({ context }) => {
-    await context.addInitScript(() => {
-      window.localStorage.setItem("outpost_access_token", "mock-access-token");
-      window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
-    });
+  test.skip(!hasTestCredentials, "Test credentials not configured");
+
+  test.beforeEach(async ({ page }) => {
+    await loginUser(page, process.env.OUTPOST_TEST_EMAIL!, process.env.OUTPOST_TEST_PASSWORD!);
   });
 
   test("displays challenges list page", async ({ page }) => {

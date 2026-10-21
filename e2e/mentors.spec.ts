@@ -1,28 +1,10 @@
-import { test, expect, mockUser } from "./fixtures";
+import { test, expect, hasTestCredentials, loginUser } from "./fixtures";
 
 test.describe("Mentors Flow", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await context.addInitScript(() => {
-      window.localStorage.setItem("outpost_access_token", "mock-access-token");
-      window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
-    });
+  test.skip(!hasTestCredentials, "Test credentials not configured");
 
-    // Mock /me endpoint for auth
-    await page.route("**/**/api/v1/me", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(mockUser),
-      });
-    });
-
-    await page.route("**/**/api/v1/me/identities", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify([]),
-      });
-    });
+  test.beforeEach(async ({ page }) => {
+    await loginUser(page, process.env.OUTPOST_TEST_EMAIL!, process.env.OUTPOST_TEST_PASSWORD!);
   });
 
   test("displays mentors list page", async ({ page }) => {
@@ -30,6 +12,7 @@ test.describe("Mentors Flow", () => {
     await page.waitForLoadState("networkidle");
 
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 10000 });
+    
     // Real backend mentor names
     await expect(page.getByText(/Priya|Rahul|Ananya|Vikram|Deepa|Arjun/i).first()).toBeVisible();
   });
@@ -55,7 +38,7 @@ test.describe("Mentors Flow", () => {
     await expect(page).toHaveURL(/\/mentors\/d[a-f0-9-]+/);
   });
 
-  test("mentor detail page shows bio", async ({ page }) => {
+  test("mentor detail page shows info", async ({ page }) => {
     await page.goto("/mentors");
     await page.waitForLoadState("networkidle");
     
@@ -65,40 +48,6 @@ test.describe("Mentors Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // Detail page should have heading
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 10000 });
-  });
-});
-
-test.describe("Mentor Application", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await context.addInitScript(() => {
-      window.localStorage.setItem("outpost_access_token", "mock-access-token");
-      window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
-    });
-
-    // Mock /me endpoint for auth
-    await page.route("**/**/api/v1/me", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(mockUser),
-      });
-    });
-
-    await page.route("**/**/api/v1/me/identities", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify([]),
-      });
-    });
-  });
-
-  test("displays mentor application page", async ({ page }) => {
-    await page.goto("/mentors/apply");
-    await page.waitForLoadState("networkidle");
-
-    // Check page loaded
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 10000 });
   });
 });

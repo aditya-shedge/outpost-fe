@@ -1,46 +1,10 @@
-import { test, expect, mockUser } from "./fixtures";
+import { test, expect, hasTestCredentials, loginUser } from "./fixtures";
 
 test.describe("Discover Page", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await context.addInitScript(() => {
-      window.localStorage.setItem("outpost_access_token", "mock-access-token");
-      window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
-    });
+  test.skip(!hasTestCredentials, "Test credentials not configured");
 
-    // Mock /me endpoint for auth
-    await page.route("**/**/api/v1/me", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(mockUser),
-      });
-    });
-
-    await page.route("**/**/api/v1/me/identities", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify([]),
-      });
-    });
-
-    // Mock spotlight
-    await page.route("**/**/api/v1/spotlight", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(null),
-      });
-    });
-
-    // Mock challenges since backend returns 500
-    await page.route("**/**/api/v1/challenges*", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } }),
-      });
-    });
+  test.beforeEach(async ({ page }) => {
+    await loginUser(page, process.env.OUTPOST_TEST_EMAIL!, process.env.OUTPOST_TEST_PASSWORD!);
   });
 
   test("displays discover page", async ({ page }) => {
@@ -60,52 +24,17 @@ test.describe("Discover Page", () => {
 });
 
 test.describe("Search", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await context.addInitScript(() => {
-      window.localStorage.setItem("outpost_access_token", "mock-access-token");
-      window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
-    });
+  test.skip(!hasTestCredentials, "Test credentials not configured");
 
-    // Mock /me endpoint for auth
-    await page.route("**/**/api/v1/me", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(mockUser),
-      });
-    });
-
-    await page.route("**/**/api/v1/me/identities", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify([]),
-      });
-    });
-
-    // Mock spotlight and challenges for search page
-    await page.route("**/**/api/v1/spotlight", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(null),
-      });
-    });
-
-    await page.route("**/**/api/v1/challenges*", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } }),
-      });
-    });
+  test.beforeEach(async ({ page }) => {
+    await loginUser(page, process.env.OUTPOST_TEST_EMAIL!, process.env.OUTPOST_TEST_PASSWORD!);
   });
 
   test("search page is accessible", async ({ page }) => {
     await page.goto("/search?q=test");
     await page.waitForLoadState("networkidle");
 
-    // Search page should show results section or no results message
+    // Search page should show results section or tabs
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
 });

@@ -225,7 +225,7 @@ export default function DiscoverPage() {
         {/* Explore All Link */}
         <div className="mt-8 text-center">
           <Link
-            href="/opportunities"
+            href="/grants"
             className="inline-flex items-center gap-2 text-sm font-medium text-ink hover:text-gold-dark transition-colors"
           >
             Explore all opportunities
