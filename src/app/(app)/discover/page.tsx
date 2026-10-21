@@ -47,18 +47,23 @@ export default function DiscoverPage() {
   // Fetch opportunities on mount
   useEffect(() => {
     const fetchOpportunities = async () => {
+      // Fetch grants and challenges independently so one failure doesn't break both
       try {
-        const [grantsRes, challengesRes] = await Promise.all([
-          getGrants({ size: 6 }),
-          getChallenges({ size: 6, status: "OPEN" }),
-        ]);
+        const grantsRes = await getGrants({ size: 6 });
         setGrants(grantsRes.content);
+      } catch (err) {
+        console.error("Failed to fetch grants:", err);
+      }
+
+      try {
+        const challengesRes = await getChallenges({ size: 6, status: "OPEN" });
         setChallenges(challengesRes.content);
       } catch (err) {
-        console.error("Failed to fetch opportunities:", err);
-      } finally {
-        setIsLoadingOpportunities(false);
+        // Challenges endpoint has backend issues - fail silently
+        console.error("Failed to fetch challenges:", err);
       }
+
+      setIsLoadingOpportunities(false);
     };
     fetchOpportunities();
   }, []);
