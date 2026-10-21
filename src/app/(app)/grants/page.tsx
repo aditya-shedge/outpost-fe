@@ -35,7 +35,7 @@ const AMOUNT_BANDS = [
 
 const DEADLINE_OPTIONS = [
   { value: "", label: "Any Deadline" },
-  { value: "OPEN", label: "Open now" },
+  { value: "OPEN_NOW", label: "Open now" },
   { value: "CLOSING_THIS_MONTH", label: "Closing this month" },
   { value: "ROLLING", label: "Rolling" },
 ] as const;
