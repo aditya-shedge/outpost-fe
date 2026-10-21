@@ -155,8 +155,8 @@ export const mockMentorDetail = {
 
 // Helper to setup common API mocks for authenticated user
 export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
-  // Set up all routes before any navigation
-  await page.route("**/api/v1/me", async (route) => {
+  // Set up all routes before any navigation - use ** glob which matches any path
+  await page.route("**/**/api/v1/me", async (route) => {
     if (route.request().method() === "GET") {
       await route.fulfill({
         status: 200,
@@ -175,7 +175,7 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     }
   });
 
-  await page.route("**/api/v1/me/identities", async (route) => {
+  await page.route("**/**/api/v1/me/identities", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -183,7 +183,7 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/lookups/stages", async (route) => {
+  await page.route("**/**/api/v1/lookups/stages", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -191,7 +191,7 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/lookups/sectors", async (route) => {
+  await page.route("**/**/api/v1/lookups/sectors", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -199,7 +199,8 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/grants?**", async (route) => {
+  // Grants - catch all variations
+  await page.route("**/**/api/v1/grants", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -207,7 +208,15 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/grants/*", async (route) => {
+  await page.route("**/**/api/v1/grants?*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(mockGrants),
+    });
+  });
+
+  await page.route("**/**/api/v1/grants/*", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -215,7 +224,8 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/challenges?**", async (route) => {
+  // Challenges
+  await page.route("**/**/api/v1/challenges", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -223,7 +233,15 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/challenges/themes", async (route) => {
+  await page.route("**/**/api/v1/challenges?*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(mockChallenges),
+    });
+  });
+
+  await page.route("**/**/api/v1/challenges/themes", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -231,8 +249,10 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/challenges/*", async (route) => {
-    if (route.request().url().includes("themes")) return;
+  await page.route("**/**/api/v1/challenges/*", async (route) => {
+    if (route.request().url().includes("themes")) {
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -240,7 +260,8 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/mentors?**", async (route) => {
+  // Mentors
+  await page.route("**/**/api/v1/mentors", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -248,7 +269,15 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/mentors/*", async (route) => {
+  await page.route("**/**/api/v1/mentors?*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(mockMentors),
+    });
+  });
+
+  await page.route("**/**/api/v1/mentors/*", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -256,7 +285,7 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/spotlight", async (route) => {
+  await page.route("**/**/api/v1/spotlight", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -264,7 +293,7 @@ export async function setupAuthenticatedMocks(page: Page, user = mockUser) {
     });
   });
 
-  await page.route("**/api/v1/benefits**", async (route) => {
+  await page.route("**/**/api/v1/benefits*", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
