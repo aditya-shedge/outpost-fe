@@ -52,6 +52,7 @@
 
 @theme inline {
   /* Colors */
+  --color-white: #ffffff;
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --color-paper-light: var(--paper-light);
@@ -200,15 +201,6 @@ a {
   text-decoration: none;
 }
 
-a:not([class*="text-"]) {
-  color: inherit;
-}
-
 a:hover {
   text-decoration: none;
-}
-
-/* Ensure Tailwind text color classes work on links */
-a[class*="text-"] {
-  color: inherit;
 }
