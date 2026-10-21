@@ -150,111 +150,104 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Main Column */}
-          <div className="lg:col-span-2 space-y-5">
-            {/* Bio Card */}
-            <div className="bg-white border border-line p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
-                <Icon name="user" className="w-4 h-4 text-green" />
-                About
-              </h2>
-              {user.profile?.bio ? (
-                <p className="text-sm text-ink leading-relaxed whitespace-pre-wrap">
-                  {user.profile.bio}
-                </p>
-              ) : (
-                <p className="text-sm text-muted italic">
-                  No bio added yet. Tell others about yourself and your startup.
-                </p>
-              )}
-            </div>
+        <div className="max-w-3xl space-y-5">
+          {/* Bio Card */}
+          <div className="bg-white border border-line p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+              <Icon name="user" className="w-4 h-4 text-green" />
+              About
+            </h2>
+            {user.profile?.bio ? (
+              <p className="text-sm text-ink leading-relaxed whitespace-pre-wrap">
+                {user.profile.bio}
+              </p>
+            ) : (
+              <p className="text-sm text-muted italic">
+                No bio added yet. Tell others about yourself and your startup.
+              </p>
+            )}
+          </div>
 
-            {/* Details Card */}
-            <div className="bg-white border border-line p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
-                <Icon name="info" className="w-4 h-4 text-green" />
-                Details
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                <DetailItem label="Location" value={user.city} />
-                <DetailItem 
-                  label="Website" 
-                  value={user.website}
-                  isLink 
-                />
-                <DetailItem label="Email" value={user.email} />
-                <DetailItem 
-                  label="Member since" 
-                  value={new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })} 
-                />
-              </div>
+          {/* Details Card */}
+          <div className="bg-white border border-line p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+              <Icon name="info" className="w-4 h-4 text-green" />
+              Details
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              <DetailItem label="Location" value={user.city} />
+              <DetailItem 
+                label="Website" 
+                value={user.website}
+                isLink 
+              />
+              <DetailItem label="Email" value={user.email} />
+              <DetailItem 
+                label="Member since" 
+                value={new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })} 
+              />
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-5">
-            {/* Social Links Card */}
-            <div className="bg-white border border-line p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
-                <Icon name="link" className="w-4 h-4 text-green" />
-                Links
-              </h2>
-              {user.profile?.links && user.profile.links.length > 0 ? (
-                <div className="space-y-2">
-                  {user.profile.links.map((link, index) => (
-                    <a
-                      key={index}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 bg-paper hover:bg-paper-light border border-line transition-colors group"
-                    >
-                      {link.type === "LINKEDIN" && <LinkedInIcon className="w-5 h-5" />}
-                      {link.type === "X" && <XIcon className="w-5 h-5" />}
-                      {link.type === "OTHER" && <Icon name="external-link" className="w-5 h-5 text-muted" />}
-                      <span className="flex-1 text-sm text-ink group-hover:text-green truncate">
-                        {link.type === "LINKEDIN" ? "LinkedIn" : link.type === "X" ? "X / Twitter" : new URL(link.url).hostname}
-                      </span>
-                      <Icon name="arrow-right" className="w-4 h-4 text-muted group-hover:text-green" />
-                    </a>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted italic">No links added yet.</p>
-              )}
-            </div>
-
-            {/* Connected Accounts Card */}
-            <div className="bg-white border border-line p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
-                <Icon name="shield" className="w-4 h-4 text-green" />
-                Account
-              </h2>
-              <div className="space-y-2">
-                <p className="text-xs text-muted mb-2">Sign-in methods</p>
-                {identities.map((identity) => (
-                  <div
-                    key={identity.provider}
-                    className="flex items-center gap-3 p-3 bg-paper border border-line"
+          {/* Links Card */}
+          <div className="bg-white border border-line p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+              <Icon name="link" className="w-4 h-4 text-green" />
+              Links
+            </h2>
+            {user.profile?.links && user.profile.links.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {user.profile.links.map((link, index) => (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 bg-paper hover:bg-paper-light border border-line transition-colors text-sm"
                   >
-                    {identity.provider === "GOOGLE" && <GoogleIcon className="w-5 h-5" />}
-                    {identity.provider === "EMAIL" && <Icon name="mail" className="w-5 h-5 text-ink" />}
-                    {identity.provider === "LINKEDIN" && <LinkedInIcon className="w-5 h-5" />}
-                    <span className="text-sm font-medium text-ink">
-                      {identity.provider === "EMAIL" ? "Email & Password" : identity.provider}
+                    {link.type === "LINKEDIN" && <LinkedInIcon className="w-4 h-4" />}
+                    {link.type === "X" && <XIcon className="w-4 h-4" />}
+                    {link.type === "OTHER" && <Icon name="external-link" className="w-4 h-4 text-muted" />}
+                    <span className="text-ink">
+                      {link.type === "LINKEDIN" ? "LinkedIn" : link.type === "X" ? "X / Twitter" : new URL(link.url).hostname}
                     </span>
-                  </div>
+                  </a>
                 ))}
               </div>
-              <Link
-                href="/profile/security"
-                className="mt-4 flex items-center gap-2 text-sm text-green hover:underline"
-              >
-                Manage security settings
-                <Icon name="arrow-right" className="w-4 h-4" />
-              </Link>
+            ) : (
+              <p className="text-sm text-muted italic">No links added yet.</p>
+            )}
+          </div>
+
+          {/* Account Card */}
+          <div className="bg-white border border-line p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+              <Icon name="shield" className="w-4 h-4 text-green" />
+              Account
+            </h2>
+            <p className="text-xs text-muted mb-2">Sign-in methods</p>
+            <div className="flex flex-wrap gap-2">
+              {identities.map((identity) => (
+                <div
+                  key={identity.provider}
+                  className="flex items-center gap-2 px-3 py-2 bg-paper border border-line text-sm"
+                >
+                  {identity.provider === "GOOGLE" && <GoogleIcon className="w-4 h-4" />}
+                  {identity.provider === "EMAIL" && <Icon name="mail" className="w-4 h-4 text-ink" />}
+                  {identity.provider === "LINKEDIN" && <LinkedInIcon className="w-4 h-4" />}
+                  <span className="font-medium text-ink">
+                    {identity.provider === "EMAIL" ? "Email & Password" : identity.provider}
+                  </span>
+                </div>
+              ))}
             </div>
+            <Link
+              href="/profile/security"
+              className="mt-3 inline-flex items-center gap-1 text-sm text-green hover:underline"
+            >
+              Manage security settings
+              <Icon name="arrow-right" className="w-3 h-3" />
+            </Link>
           </div>
         </div>
       </div>
