@@ -81,9 +81,21 @@ export function GoogleButton({
   const handleCredentialResponse = useCallback(async (response: { credential: string }) => {
     setIsLoading(true);
     try {
-      await authApi.googleOAuth({ idToken: response.credential });
+      const authResponse = await authApi.googleOAuth({ idToken: response.credential });
+      
+      // Fetch user to check onboarding status
+      const user = await authApi.getMe();
+      
       onSuccess?.();
-      router.push("/discover");
+      
+      // Redirect based on user state
+      if (!user.emailVerified) {
+        router.push("/verify-email");
+      } else if (!user.onboarded) {
+        router.push("/onboarding");
+      } else {
+        router.push("/discover");
+      }
     } catch (error) {
       const err = error instanceof Error ? error : new Error("Google sign-in failed");
       toast.error(err.message);
