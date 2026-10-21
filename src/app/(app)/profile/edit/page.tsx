@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth/context";
 import { meApi } from "@/lib/api/me";
 import { getStages, getSectors } from "@/lib/api/lookups";
 import { Icon, Input, Button, PageLoader, ApiErrorDisplay, showToast, BioLinksEditor, PitchDeckUpload } from "@/components/ui";
-import type { LookupResponse, ProfilePatchRequest, EnrichedProfile, PitchDeckResponse } from "@/lib/api/types";
+import type { LookupResponse, ProfilePatchRequest, PitchDeckResponse } from "@/lib/api/types";
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -26,7 +26,6 @@ export default function ProfileEditPage() {
   const [sectors, setSectors] = useState<LookupResponse[]>([]);
   
   // Enriched profile data (bio, links, pitch deck)
-  const [enrichedProfile, setEnrichedProfile] = useState<EnrichedProfile | null>(null);
   const [pitchDeck, setPitchDeck] = useState<PitchDeckResponse | null>(null);
   
   // UI state
@@ -54,14 +53,6 @@ export default function ProfileEditPage() {
           setSectorId(user.sectorId || "");
           setCity(user.city || "");
           setWebsite(user.website || "");
-        }
-        
-        // Load enriched profile (bio, links)
-        try {
-          const enriched = await meApi.getEnrichedProfile();
-          setEnrichedProfile(enriched);
-        } catch {
-          // Enriched profile may not exist yet
         }
         
         // Load pitch deck
@@ -326,9 +317,10 @@ export default function ProfileEditPage() {
             Bio & Links
           </h2>
           <BioLinksEditor
-            initialBio={enrichedProfile?.bio || ""}
-            initialLinks={enrichedProfile?.links || []}
+            initialBio={user.profile?.bio || ""}
+            initialLinks={user.profile?.links || []}
             onSaveSuccess={() => {
+              refreshUser();
               showToast.success("Bio and links updated");
             }}
           />
