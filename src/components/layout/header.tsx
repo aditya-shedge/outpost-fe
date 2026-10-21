@@ -12,6 +12,7 @@ const navItems = [
   { href: "/discover", label: "Discover", icon: HomeIcon },
   { href: "/grants", label: "Opportunities", icon: GridIcon },
   { href: "/mentors", label: "Mentors", icon: MentorsIcon },
+  { href: "/saved", label: "Saved", icon: BookmarkIcon },
 ];
 
 export function Header() {
@@ -322,6 +323,22 @@ function LogoutIcon({ className }: { className?: string }) {
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
+function BookmarkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
     </svg>
   );
 }
