@@ -25,6 +25,11 @@ export default function DiscoverPage() {
   const [grants, setGrants] = useState<GrantWithAi[]>([]);
   const [challenges, setChallenges] = useState<ChallengeWithAi[]>([]);
   const [mentors, setMentors] = useState<MentorWithAi[]>([]);
+  
+  // Total counts for stats
+  const [totalGrants, setTotalGrants] = useState(0);
+  const [totalChallenges, setTotalChallenges] = useState(0);
+  const [totalMentors, setTotalMentors] = useState(0);
   // Spotlight feature not yet implemented in backend
   // const [spotlight, setSpotlight] = useState<SpotlightFounder | null>(null);
   
@@ -51,6 +56,7 @@ export default function DiscoverPage() {
       try {
         const grantsRes = await getGrants({ size: 6 });
         setGrants(grantsRes.content);
+        setTotalGrants(grantsRes.page.totalElements ?? 0);
       } catch (err) {
         console.error("Failed to fetch grants:", err);
       }
@@ -58,6 +64,7 @@ export default function DiscoverPage() {
       try {
         const challengesRes = await getChallenges({ size: 6, status: "OPEN" });
         setChallenges(challengesRes.content);
+        setTotalChallenges(challengesRes.page.totalElements ?? 0);
       } catch (err) {
         // Challenges endpoint has backend issues - fail silently
         console.error("Failed to fetch challenges:", err);
@@ -74,6 +81,7 @@ export default function DiscoverPage() {
       try {
         const mentorsRes = await getMentors({ size: 3 });
         setMentors(mentorsRes.content);
+        setTotalMentors(mentorsRes.page.totalElements ?? 0);
       } catch (err) {
         console.error("Failed to fetch mentors:", err);
       } finally {
@@ -111,8 +119,8 @@ export default function DiscoverPage() {
 
   // Stats
   const stats = {
-    openCalls: grants.length + challenges.length,
-    mentors: mentors.length,
+    openCalls: totalGrants + totalChallenges,
+    mentors: totalMentors,
     closingSoon: allOpportunities.filter((opp) => {
       if (!opp.deadline) return false;
       const daysUntil = Math.ceil((opp.deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
