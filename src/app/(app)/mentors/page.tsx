@@ -177,12 +177,25 @@ function MentorsContent() {
           <span className="w-[7px] h-[7px] rounded-full bg-green" />
           FOUNDER TO FOUNDER
         </p>
-        <h1 className="font-serif font-bold text-[clamp(34px,4vw,49px)] leading-[1.05] tracking-[-0.06em] mb-4">
-          Connect with Mentors
-        </h1>
-        <p className="max-w-[520px] text-muted leading-[1.75] text-[15px]">
-          Get guidance from operators, investors, and experts who&apos;ve been in your shoes.
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="font-serif font-bold text-[clamp(34px,4vw,49px)] leading-[1.05] tracking-[-0.06em] mb-4">
+              Connect with Mentors
+            </h1>
+            <p className="max-w-[520px] text-muted leading-[1.75] text-[15px]">
+              Get guidance from operators, investors, and experts who&apos;ve been in your shoes.
+            </p>
+          </div>
+          <a
+            href="/mentors/apply"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green text-white text-sm font-medium hover:bg-green-dark transition-colors whitespace-nowrap"
+          >
+            Become a Mentor
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
       </section>
 
       {/* Search & AI Toggle */}
