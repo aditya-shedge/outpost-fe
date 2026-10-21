@@ -1,4 +1,4 @@
-import { test, expect, setupAuthenticatedMocks } from "./fixtures";
+import { test, expect, mockUser } from "./fixtures";
 
 test.describe("Navigation", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -7,7 +7,39 @@ test.describe("Navigation", () => {
       window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
     });
 
-    await setupAuthenticatedMocks(page);
+    // Mock /me endpoint for auth
+    await page.route("**/**/api/v1/me", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(mockUser),
+      });
+    });
+
+    await page.route("**/**/api/v1/me/identities", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([]),
+      });
+    });
+
+    // Mock spotlight and challenges for discover page
+    await page.route("**/**/api/v1/spotlight", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(null),
+      });
+    });
+
+    await page.route("**/**/api/v1/challenges*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } }),
+      });
+    });
   });
 
   test("navigation links are visible on desktop", async ({ page }) => {
@@ -15,18 +47,19 @@ test.describe("Navigation", () => {
     await page.goto("/discover");
     await page.waitForLoadState("networkidle");
 
-    // Check for navigation links - actual labels from the app
-    await expect(page.getByRole("link", { name: /discover/i })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole("link", { name: /opportunities/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /mentors/i })).toBeVisible();
+    // Check for navigation links in the header nav
+    const nav = page.locator("header nav");
+    await expect(nav.getByRole("link", { name: "Discover" })).toBeVisible({ timeout: 10000 });
+    await expect(nav.getByRole("link", { name: "Opportunities" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Mentors" })).toBeVisible();
   });
 
   test("can navigate to grants/opportunities page", async ({ page }) => {
     await page.goto("/discover");
     await page.waitForLoadState("networkidle");
 
-    // Nav link might be "Opportunities" not "Grants"
-    await page.getByRole("link", { name: /opportunities/i }).click();
+    // Click the nav link specifically
+    await page.locator("header nav").getByRole("link", { name: "Opportunities" }).click();
 
     await expect(page).toHaveURL(/\/grants/);
   });
@@ -35,7 +68,7 @@ test.describe("Navigation", () => {
     await page.goto("/discover");
     await page.waitForLoadState("networkidle");
 
-    await page.getByRole("link", { name: /mentors/i }).click();
+    await page.locator("header nav").getByRole("link", { name: "Mentors" }).click();
 
     await expect(page).toHaveURL(/\/mentors/);
   });
@@ -55,7 +88,39 @@ test.describe("Mobile Navigation", () => {
       window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
     });
 
-    await setupAuthenticatedMocks(page);
+    // Mock /me endpoint for auth
+    await page.route("**/**/api/v1/me", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(mockUser),
+      });
+    });
+
+    await page.route("**/**/api/v1/me/identities", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([]),
+      });
+    });
+
+    // Mock spotlight and challenges
+    await page.route("**/**/api/v1/spotlight", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(null),
+      });
+    });
+
+    await page.route("**/**/api/v1/challenges*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } }),
+      });
+    });
   });
 
   test("shows navigation on mobile", async ({ page }) => {
@@ -63,7 +128,7 @@ test.describe("Mobile Navigation", () => {
     await page.goto("/discover");
     await page.waitForLoadState("networkidle");
 
-    // Mobile should have some form of navigation
-    await expect(page.locator("nav")).toBeVisible({ timeout: 10000 });
+    // Mobile bottom navigation should be visible (the one with fixed bottom-0)
+    await expect(page.locator("nav.md\\:hidden")).toBeVisible({ timeout: 10000 });
   });
 });

@@ -1,4 +1,4 @@
-import { test, expect, setupAuthenticatedMocks, mockUserNotOnboarded, mockUser, mockStages, mockSectors } from "./fixtures";
+import { test, expect, mockUserNotOnboarded, mockUser, mockStages, mockSectors } from "./fixtures";
 
 test.describe("Onboarding Flow", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -7,8 +7,8 @@ test.describe("Onboarding Flow", () => {
       window.localStorage.setItem("outpost_refresh_token", "mock-refresh-token");
     });
 
-    // Mock for non-onboarded user
-    await page.route("**/api/v1/me", async (route) => {
+    // Mock for non-onboarded user - need mocks here since we can't use real backend for this
+    await page.route("**/**/api/v1/me", async (route) => {
       if (route.request().method() === "GET") {
         await route.fulfill({
           status: 200,
@@ -20,7 +20,7 @@ test.describe("Onboarding Flow", () => {
       }
     });
 
-    await page.route("**/api/v1/lookups/stages", async (route) => {
+    await page.route("**/**/api/v1/lookups/stages", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -28,7 +28,7 @@ test.describe("Onboarding Flow", () => {
       });
     });
 
-    await page.route("**/api/v1/lookups/sectors", async (route) => {
+    await page.route("**/**/api/v1/lookups/sectors", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -74,8 +74,24 @@ test.describe("Onboarding Flow", () => {
   });
 
   test("completes onboarding and redirects to discover", async ({ page }) => {
-    // Mock successful onboarding
-    await page.route("**/api/v1/me/onboarding", async (route) => {
+    // Track onboarding state
+    let onboardingComplete = false;
+
+    // Override the me route to handle onboarding
+    await page.route("**/**/api/v1/me", async (route) => {
+      if (route.request().method() === "GET") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(onboardingComplete ? mockUser : mockUserNotOnboarded),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.route("**/**/api/v1/me/onboarding", async (route) => {
+      onboardingComplete = true;
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -83,29 +99,22 @@ test.describe("Onboarding Flow", () => {
       });
     });
 
-    // After onboarding, /me returns onboarded user
-    let onboardingComplete = false;
-    await page.route("**/api/v1/me", async (route) => {
-      if (route.request().method() === "GET") {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify(onboardingComplete ? mockUser : mockUserNotOnboarded),
-        });
-      } else if (route.request().method() === "POST") {
-        onboardingComplete = true;
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify(mockUser),
-        });
-      } else {
-        await route.continue();
-      }
+    // Mock other endpoints for after redirect
+    await page.route("**/**/api/v1/grants*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } }),
+      });
     });
 
-    // Setup other mocks for after redirect
-    await setupAuthenticatedMocks(page);
+    await page.route("**/**/api/v1/spotlight", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(null),
+      });
+    });
 
     await page.goto("/onboarding");
     await page.waitForLoadState("networkidle");
