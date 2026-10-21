@@ -85,29 +85,29 @@ export default function ProfilePage() {
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-green/10 via-paper to-gold/5 border-b border-line">
         <div className="max-w-5xl mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row md:items-start gap-5">
+          <div className="flex flex-col md:flex-row md:items-center gap-6">
             {/* Avatar */}
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green to-green/80 flex items-center justify-center text-2xl font-bold text-white shadow-lg flex-shrink-0">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green to-green/80 flex items-center justify-center text-3xl font-bold text-white shadow-lg flex-shrink-0">
               {initials}
             </div>
             
             {/* Name & Startup */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold text-ink leading-tight">
+              <h1 className="text-2xl font-bold text-ink">
                 {user.founderName || "Founder"}
               </h1>
-              <p className="text-base text-muted mt-1">
+              <p className="text-base text-muted">
                 {user.startupName || "Startup"}
               </p>
               {(stageName || sectorName) && (
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap items-center gap-3 mt-2">
                   {stageName && (
-                    <span className="px-2.5 py-0.5 bg-blue/10 text-blue-dark text-xs font-medium rounded-full">
+                    <span className="px-3 py-1 bg-paper text-ink text-sm font-medium border border-line">
                       {stageName}
                     </span>
                   )}
                   {sectorName && (
-                    <span className="px-2.5 py-0.5 bg-gold/10 text-gold-dark text-xs font-medium rounded-full">
+                    <span className="px-3 py-1 bg-gold/10 text-gold-dark text-sm font-medium">
                       {sectorName}
                     </span>
                   )}
@@ -150,33 +150,33 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Main Column */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-5">
             {/* Bio Card */}
-            <div className="bg-white border border-line p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-                <Icon name="user" className="w-5 h-5 text-green" />
+            <div className="bg-white border border-line p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+                <Icon name="user" className="w-4 h-4 text-green" />
                 About
               </h2>
               {user.profile?.bio ? (
-                <p className="text-ink leading-relaxed whitespace-pre-wrap">
+                <p className="text-sm text-ink leading-relaxed whitespace-pre-wrap">
                   {user.profile.bio}
                 </p>
               ) : (
-                <p className="text-muted italic">
+                <p className="text-sm text-muted italic">
                   No bio added yet. Tell others about yourself and your startup.
                 </p>
               )}
             </div>
 
             {/* Details Card */}
-            <div className="bg-white border border-line p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-                <Icon name="info" className="w-5 h-5 text-green" />
+            <div className="bg-white border border-line p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+                <Icon name="info" className="w-4 h-4 text-green" />
                 Details
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <DetailItem label="Location" value={user.city} />
                 <DetailItem 
                   label="Website" 
@@ -193,11 +193,11 @@ export default function ProfilePage() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Social Links Card */}
-            <div className="bg-white border border-line p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-                <Icon name="link" className="w-5 h-5 text-green" />
+            <div className="bg-white border border-line p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+                <Icon name="link" className="w-4 h-4 text-green" />
                 Links
               </h2>
               {user.profile?.links && user.profile.links.length > 0 ? (
@@ -226,13 +226,13 @@ export default function ProfilePage() {
             </div>
 
             {/* Connected Accounts Card */}
-            <div className="bg-white border border-line p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-                <Icon name="shield" className="w-5 h-5 text-green" />
+            <div className="bg-white border border-line p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+                <Icon name="shield" className="w-4 h-4 text-green" />
                 Account
               </h2>
-              <div className="space-y-3">
-                <p className="text-sm text-muted mb-3">Sign-in methods</p>
+              <div className="space-y-2">
+                <p className="text-xs text-muted mb-2">Sign-in methods</p>
                 {identities.map((identity) => (
                   <div
                     key={identity.provider}
