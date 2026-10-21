@@ -180,24 +180,13 @@ export default function ProfilePage() {
           <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-4">
             Security
           </h2>
-          <div className="flex flex-col sm:flex-row gap-4">
-            {identities.some((i) => i.provider === "EMAIL") && (
-              <Link
-                href="/profile/security"
-                className="inline-flex items-center gap-2 px-4 py-2 border border-line text-ink font-medium hover:bg-paper transition-colors"
-              >
-                <Icon name="lock" className="w-4 h-4" />
-                Change password
-              </Link>
-            )}
-            <Link
-              href="/profile/security"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-line text-ink font-medium hover:bg-paper transition-colors"
-            >
-              <Icon name="shield" className="w-4 h-4" />
-              Manage sign-in methods
-            </Link>
-          </div>
+          <Link
+            href="/profile/security"
+            className="inline-flex items-center gap-2 px-4 py-2 border border-line text-ink font-medium hover:bg-paper transition-colors"
+          >
+            <Icon name="shield" className="w-4 h-4" />
+            Security settings
+          </Link>
         </section>
       </div>
     </div>
