@@ -156,12 +156,16 @@ export async function getAdminMentors(
   if (params.q) searchParams.set("q", params.q);
 
   const query = searchParams.toString();
-  const response = await api.get<{ content: MentorAdminResponse[]; page: PageMetadata }>(
+  // Backend returns a plain array, not paginated
+  const response = await api.get<MentorAdminResponse[]>(
     `/api/v1/admin/mentors${query ? `?${query}` : ""}`
   );
+  
+  // Convert to paginated format for consistency with UI
+  const content = response || [];
   return {
-    content: response?.content || [],
-    page: response?.page || { number: 0, size: 20, totalElements: 0, totalPages: 0 },
+    content,
+    page: { number: 0, size: content.length, totalElements: content.length, totalPages: 1 },
   };
 }
 
