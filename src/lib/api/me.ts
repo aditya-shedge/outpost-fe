@@ -65,14 +65,6 @@ export const meApi = {
     return api.patch<EnrichedProfile>("/api/v1/me/profile", data);
   },
 
-  /**
-   * Get enriched profile (bio and links)
-   * Note: This might be included in the main /me response when backend supports it
-   */
-  getEnrichedProfile: async (): Promise<EnrichedProfile> => {
-    return api.get<EnrichedProfile>("/api/v1/me/profile");
-  },
-
   // ============================================
   // Pitch Deck (FE-046)
   // Backend: /api/v1/me/pitch-deck (OP-052)
