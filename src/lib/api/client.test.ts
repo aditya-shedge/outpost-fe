@@ -7,13 +7,13 @@ describe("ApiClientError", () => {
       error: "Bad Request",
       code: "VALIDATION_ERROR",
       message: "Email is required",
-      errors: ["email: must not be blank"],
+      errors: [{ field: "email", message: "must not be blank" }],
     });
 
     expect(error.status).toBe(400);
     expect(error.code).toBe("VALIDATION_ERROR");
     expect(error.message).toBe("Email is required");
-    expect(error.errors).toEqual(["email: must not be blank"]);
+    expect(error.errors).toEqual([{ field: "email", message: "must not be blank" }]);
     expect(error.name).toBe("ApiClientError");
   });
 

@@ -1,4 +1,4 @@
-import { ApiError } from "./types";
+import { ApiError, ValidationError } from "./types";
 import {
   getAccessToken,
   getRefreshToken,
@@ -15,15 +15,15 @@ let refreshPromise: Promise<boolean> | null = null;
 export class ApiClientError extends Error {
   status: number;
   code: string;
-  errors?: string[];
+  errors?: ValidationError[];
 
-  constructor(status: number, code: string, message: string, errors?: string[]);
+  constructor(status: number, code: string, message: string, errors?: ValidationError[]);
   constructor(apiError: ApiError);
   constructor(
     statusOrError: number | ApiError,
     code?: string,
     message?: string,
-    errors?: string[]
+    errors?: ValidationError[]
   ) {
     if (typeof statusOrError === "number") {
       super(message || "An error occurred");

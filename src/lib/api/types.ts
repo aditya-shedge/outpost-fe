@@ -120,12 +120,17 @@ export interface PaginatedResponse<T> {
 // API Error shape (RFC 7807 ProblemDetail)
 // ============================================
 
+export interface ValidationError {
+  field: string;
+  message: string;
+}
+
 export interface ApiError {
   status: number;
   error: string;
   code: string;
   message: string;
-  errors?: string[];
+  errors?: ValidationError[];
 }
 
 // ============================================

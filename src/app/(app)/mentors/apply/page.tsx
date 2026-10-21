@@ -68,8 +68,8 @@ export default function MentorApplyPage() {
 
     if (!formData.calcomUrl?.trim()) {
       newErrors.calcomUrl = "Cal.com URL is required";
-    } else if (!formData.calcomUrl.includes("cal.com")) {
-      newErrors.calcomUrl = "Please enter a valid cal.com URL";
+    } else if (!/^https:\/\/cal\.com\/[\w-]+/.test(formData.calcomUrl)) {
+      newErrors.calcomUrl = "Please enter a valid cal.com URL (e.g. https://cal.com/yourname)";
     }
 
     if (formData.photoUrl && !formData.photoUrl.startsWith("http")) {
@@ -99,7 +99,21 @@ export default function MentorApplyPage() {
       setIsSuccess(true);
     } catch (err) {
       if (err instanceof ApiClientError) {
-        if (err.status === 409) {
+        // Handle field-level validation errors from backend
+        if (err.status === 400 && err.errors && Array.isArray(err.errors)) {
+          const fieldErrors: Record<string, string> = {};
+          for (const error of err.errors) {
+            if (error.field && error.message) {
+              fieldErrors[error.field] = error.message;
+            }
+          }
+          if (Object.keys(fieldErrors).length > 0) {
+            setErrors(fieldErrors);
+            setSubmitError("Please fix the validation errors below.");
+          } else {
+            setSubmitError(err.message || "Validation failed. Please check your inputs.");
+          }
+        } else if (err.status === 409) {
           setSubmitError("An application with this email has already been submitted.");
         } else if (err.status === 429) {
           setSubmitError("Too many applications. Please try again later.");

@@ -72,9 +72,9 @@ export function ApiErrorDisplay({
           <p className="text-rose-dark font-medium">{message}</p>
           {fieldErrors.length > 0 && (
             <ul className="mt-2 text-sm text-rose-dark space-y-1">
-              {fieldErrors.map((fieldError: string, i: number) => (
+              {fieldErrors.map((fieldError, i: number) => (
                 <li key={i}>
-                  {fieldError}
+                  {typeof fieldError === 'string' ? fieldError : `${fieldError.field}: ${fieldError.message}`}
                 </li>
               ))}
             </ul>
