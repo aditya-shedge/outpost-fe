@@ -1,11 +1,30 @@
-import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Brand } from "@/components/ui/brand";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      {/* Simple public header */}
+      <header className="sticky top-0 z-50 h-16 border-b border-line bg-paper-light">
+        <div className="max-w-[1440px] mx-auto h-full flex items-center justify-between px-6 lg:px-10">
+          <Brand />
+          <div className="flex items-center gap-4">
+            <Link
+              href="/login"
+              className="px-4 py-2 text-sm font-medium text-ink hover:text-green transition-colors"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/signup"
+              className="px-4 py-2 text-sm font-medium bg-ink text-white hover:bg-green transition-colors"
+            >
+              Sign up
+            </Link>
+          </div>
+        </div>
+      </header>
       
       <main className="flex-1">
         {/* Hero Section */}
