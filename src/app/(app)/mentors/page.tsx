@@ -9,18 +9,14 @@ import { LoadingSpinner } from "@/components/ui";
 import { MentorCard, MentorCardSkeleton } from "@/components/ui/mentor-card";
 import type { LookupResponse, MentorWithAi, PageMetadata } from "@/lib/api/types";
 
-// Common expertise tags - can be fetched from API in future
+// Expertise tags from backend data
 const EXPERTISE_OPTIONS = [
+  "Engineering & Tech",
+  "Finance & CFO",
   "Fundraising",
-  "Product",
-  "Marketing",
-  "Sales",
-  "Operations",
-  "Technology",
-  "Legal",
-  "Finance",
-  "HR",
-  "Strategy",
+  "Growth & Marketing",
+  "Product Management",
+  "Sales & BD",
 ];
 
 export default function MentorsPage() {
