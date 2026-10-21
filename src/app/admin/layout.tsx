@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/context";
@@ -13,10 +13,37 @@ const adminNavItems = [
   { href: "/admin/mentors", label: "Mentors", icon: MentorsIcon },
 ];
 
+function AdminNav() {
+  const pathname = usePathname();
+  
+  return (
+    <nav className="space-y-1 px-3">
+      {adminNavItems.map((item) => {
+        const isActive = pathname === item.href || 
+          (item.href !== "/admin" && pathname.startsWith(item.href));
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`flex items-center gap-3 px-3 py-2 text-sm rounded transition-colors ${
+              isActive
+                ? "bg-gold/20 text-gold"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
   const isAdmin = user?.role === "ADMIN";
 
@@ -62,27 +89,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-56 min-h-[calc(100vh-56px)] bg-[#16162a] border-r border-[#2d2d4a] py-4">
-          <nav className="space-y-1 px-3">
-            {adminNavItems.map((item) => {
-              const isActive = pathname === item.href || 
-                (item.href !== "/admin" && pathname.startsWith(item.href));
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2 text-sm rounded transition-colors ${
-                    isActive
-                      ? "bg-gold/20 text-gold"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+          <Suspense fallback={<div className="px-3 py-2 text-gray-400">Loading...</div>}>
+            <AdminNav />
+          </Suspense>
         </aside>
 
         {/* Main Content */}
