@@ -84,30 +84,30 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-paper">
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-green/10 via-paper to-gold/5 border-b border-line">
-        <div className="max-w-5xl mx-auto px-6 py-10">
-          <div className="flex flex-col md:flex-row md:items-center gap-6">
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <div className="flex flex-col md:flex-row md:items-start gap-5">
             {/* Avatar */}
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green to-green/80 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green to-green/80 flex items-center justify-center text-2xl font-bold text-white shadow-lg flex-shrink-0">
               {initials}
             </div>
             
             {/* Name & Startup */}
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-ink mb-1">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-ink leading-tight">
                 {user.founderName || "Founder"}
               </h1>
-              <p className="text-lg text-muted flex items-center gap-2">
+              <p className="text-base text-muted mt-1">
                 {user.startupName || "Startup"}
               </p>
               {(stageName || sectorName) && (
-                <div className="flex flex-wrap gap-2 mt-3">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {stageName && (
-                    <span className="px-3 py-1 bg-blue/10 text-blue-dark text-sm font-medium rounded-full">
+                    <span className="px-2.5 py-0.5 bg-blue/10 text-blue-dark text-xs font-medium rounded-full">
                       {stageName}
                     </span>
                   )}
                   {sectorName && (
-                    <span className="px-3 py-1 bg-gold/10 text-gold-dark text-sm font-medium rounded-full">
+                    <span className="px-2.5 py-0.5 bg-gold/10 text-gold-dark text-xs font-medium rounded-full">
                       {sectorName}
                     </span>
                   )}
