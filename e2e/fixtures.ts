@@ -16,8 +16,20 @@ export async function loginUser(page: Page, email: string, password: string) {
   await page.getByPlaceholder(/••••/).fill(password);
   await page.getByRole("button", { name: /sign in$/i }).click();
   
-  // Wait for redirect after login
-  await page.waitForURL(/\/(discover|onboarding)/, { timeout: 15000 });
+  // Wait for either successful redirect OR error message
+  const result = await Promise.race([
+    page.waitForURL(/\/(discover|onboarding)/, { timeout: 15000 }).then(() => "success"),
+    page.getByText(/invalid|incorrect|error|failed/i).waitFor({ timeout: 15000 }).then(() => "error"),
+  ]).catch(() => "timeout");
+  
+  if (result === "error") {
+    const errorText = await page.getByText(/invalid|incorrect|error|failed/i).first().textContent();
+    throw new Error(`Login failed: ${errorText}`);
+  }
+  
+  if (result === "timeout") {
+    throw new Error("Login timed out - check if backend is running at localhost:8080 and credentials are valid");
+  }
 }
 
 // Extended test with auth helpers for real backend
