@@ -6,8 +6,8 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth/context";
 import { meApi } from "@/lib/api/me";
 import { getStages, getSectors } from "@/lib/api/lookups";
-import { Icon, Input, Button, PageLoader, ApiErrorDisplay, showToast } from "@/components/ui";
-import type { LookupResponse, ProfilePatchRequest } from "@/lib/api/types";
+import { Icon, Input, Button, PageLoader, ApiErrorDisplay, showToast, BioLinksEditor, PitchDeckUpload } from "@/components/ui";
+import type { LookupResponse, ProfilePatchRequest, EnrichedProfile, PitchDeckResponse } from "@/lib/api/types";
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -24,6 +24,10 @@ export default function ProfileEditPage() {
   // Lookup data
   const [stages, setStages] = useState<LookupResponse[]>([]);
   const [sectors, setSectors] = useState<LookupResponse[]>([]);
+  
+  // Enriched profile data (bio, links, pitch deck)
+  const [enrichedProfile, setEnrichedProfile] = useState<EnrichedProfile | null>(null);
+  const [pitchDeck, setPitchDeck] = useState<PitchDeckResponse | null>(null);
   
   // UI state
   const [loading, setLoading] = useState(true);
@@ -50,6 +54,22 @@ export default function ProfileEditPage() {
           setSectorId(user.sectorId || "");
           setCity(user.city || "");
           setWebsite(user.website || "");
+        }
+        
+        // Load enriched profile (bio, links)
+        try {
+          const enriched = await meApi.getEnrichedProfile();
+          setEnrichedProfile(enriched);
+        } catch {
+          // Enriched profile may not exist yet
+        }
+        
+        // Load pitch deck
+        try {
+          const deck = await meApi.hasPitchDeck();
+          setPitchDeck(deck);
+        } catch {
+          // Pitch deck may not exist yet
         }
       } catch (err) {
         showToast.error("Failed to load profile data");
@@ -298,6 +318,38 @@ export default function ProfileEditPage() {
               Email cannot be changed. Contact support if you need to update your email address.
             </p>
           </div>
+        </section>
+
+        {/* Bio & Links */}
+        <section>
+          <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-4">
+            Bio & Links
+          </h2>
+          <BioLinksEditor
+            initialBio={enrichedProfile?.bio || ""}
+            initialLinks={enrichedProfile?.links || []}
+            onSaveSuccess={() => {
+              showToast.success("Bio and links updated");
+            }}
+          />
+        </section>
+
+        {/* Pitch Deck */}
+        <section>
+          <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-4">
+            Pitch Deck
+          </h2>
+          <PitchDeckUpload
+            initialPitchDeck={pitchDeck}
+            onUploadSuccess={(deck) => {
+              setPitchDeck(deck);
+              showToast.success("Pitch deck uploaded");
+            }}
+            onDeleteSuccess={() => {
+              setPitchDeck(null);
+              showToast.success("Pitch deck removed");
+            }}
+          />
         </section>
 
         {/* Actions */}
