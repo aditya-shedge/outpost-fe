@@ -25,7 +25,8 @@ export default function DiscoverPage() {
   const [grants, setGrants] = useState<GrantWithAi[]>([]);
   const [challenges, setChallenges] = useState<ChallengeWithAi[]>([]);
   const [mentors, setMentors] = useState<MentorWithAi[]>([]);
-  const [spotlight, setSpotlight] = useState<SpotlightFounder | null>(null);
+  // Spotlight feature not yet implemented in backend
+  // const [spotlight, setSpotlight] = useState<SpotlightFounder | null>(null);
   
   // Loading state
   const [isLoadingOpportunities, setIsLoadingOpportunities] = useState(true);
@@ -34,14 +35,14 @@ export default function DiscoverPage() {
   // Filter state
   const [opportunityFilter, setOpportunityFilter] = useState<OpportunityFilter>("all");
 
-  // Fetch spotlight on mount
-  useEffect(() => {
-    const fetchSpotlight = async () => {
-      const spotlightData = await getSpotlight();
-      setSpotlight(spotlightData);
-    };
-    fetchSpotlight();
-  }, []);
+  // Spotlight feature not yet implemented in backend
+  // useEffect(() => {
+  //   const fetchSpotlight = async () => {
+  //     const spotlightData = await getSpotlight();
+  //     setSpotlight(spotlightData);
+  //   };
+  //   fetchSpotlight();
+  // }, []);
 
   // Fetch opportunities on mount
   useEffect(() => {
@@ -133,8 +134,8 @@ export default function DiscoverPage() {
         </p>
       </section>
 
-      {/* FE-039: Spotlight Section - only show if spotlight exists */}
-      {spotlight && <SpotlightSection founder={spotlight} />}
+      {/* FE-039: Spotlight Section - not yet implemented in backend */}
+      {/* {spotlight && <SpotlightSection founder={spotlight} />} */}
 
       {/* FE-016: Stats */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
