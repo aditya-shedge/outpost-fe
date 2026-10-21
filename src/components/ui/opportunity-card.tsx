@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/ui";
+import { BookmarkButton } from "@/components/ui/bookmark-button";
 import type { GrantWithAi, ChallengeWithAi } from "@/lib/api/types";
 
 type OpportunityType = "grant" | "challenge";
@@ -69,13 +70,13 @@ export function OpportunityCard({ type, data, showAiReason = false }: Opportunit
         <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-1 ${badgeColors[type]}`}>
           {type === "grant" ? "Grant" : "Challenge"}
         </span>
-        <button 
-          type="button"
-          className="text-muted hover:text-gold-dark transition-colors"
-          aria-label="Save opportunity"
-        >
-          <Icon name="bookmark" className="size-4" />
-        </button>
+        <BookmarkButton
+          item={{
+            id: id!,
+            type: type,
+            name: title,
+          }}
+        />
       </div>
 
       {/* Organization */}
