@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { authApi } from "@/lib/api/auth";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 declare global {
@@ -75,26 +74,26 @@ export function GoogleButton({
 }: GoogleButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
-  const router = useRouter();
   const buttonRef = useRef<HTMLDivElement>(null);
 
   const handleCredentialResponse = useCallback(async (response: { credential: string }) => {
     setIsLoading(true);
     try {
-      const authResponse = await authApi.googleOAuth({ idToken: response.credential });
+      await authApi.googleOAuth({ idToken: response.credential });
       
       // Fetch user to check onboarding status
       const user = await authApi.getMe();
       
       onSuccess?.();
       
-      // Redirect based on user state
+      // Use window.location for redirect to ensure full page load
+      // This resets the auth context properly
       if (!user.emailVerified) {
-        router.push("/verify-email");
+        window.location.href = "/verify-email";
       } else if (!user.onboarded) {
-        router.push("/onboarding");
+        window.location.href = "/onboarding";
       } else {
-        router.push("/discover");
+        window.location.href = "/discover";
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error("Google sign-in failed");
@@ -102,7 +101,7 @@ export function GoogleButton({
       onError?.(err);
       setIsLoading(false);
     }
-  }, [onSuccess, onError, router]);
+  }, [onSuccess, onError]);
 
   useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
