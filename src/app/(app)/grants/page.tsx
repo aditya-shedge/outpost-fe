@@ -28,8 +28,8 @@ const GRANT_TYPES = [
 const AMOUNT_BANDS = [
   { value: "", label: "Any Amount" },
   { value: "UNDER_10L", label: "Under ₹10L" },
-  { value: "10L_TO_50L", label: "₹10L - 50L" },
-  { value: "50L_TO_1CR", label: "₹50L - 1Cr" },
+  { value: "10L_50L", label: "₹10L - 50L" },
+  { value: "50L_1CR", label: "₹50L - 1Cr" },
   { value: "OVER_1CR", label: "Over ₹1Cr" },
 ] as const;
 
