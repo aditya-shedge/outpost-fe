@@ -68,28 +68,39 @@ export interface PitchDeckResponse {
 // ============================================
 
 export type LinkType = "LINKEDIN" | "X" | "OTHER";
+export type ProfileVisibility = "PRIVATE" | "THUB" | "PUBLIC";
 
 export interface FounderLink {
   type: LinkType;
   url: string;
 }
 
+export interface ProfileResponse {
+  bio?: string | null;
+  links?: FounderLink[] | null;
+  visibility?: ProfileVisibility;
+}
+
 export interface EnrichedProfileRequest {
   bio?: string | null;
   links?: FounderLink[] | null;
+  visibility?: ProfileVisibility;
 }
 
 export interface EnrichedProfile {
   bio?: string | null;
   links?: FounderLink[] | null;
+  visibility?: ProfileVisibility;
 }
 
 // ============================================
 // Convenience type aliases
 // ============================================
 
-// Alias for backward compatibility
-export type User = FounderResponse;
+// User extends FounderResponse with profile (included in /me response)
+export type User = FounderResponse & {
+  profile?: ProfileResponse;
+};
 export type Stage = LookupResponse;
 export type Sector = LookupResponse;
 export type Grant = GrantDetailResponse;
