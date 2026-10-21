@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Icon, Input, Button, showToast } from "@/components/ui";
+import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
+import { Icon, Input, showToast } from "@/components/ui";
 import { meApi } from "@/lib/api/me";
 import type { FounderLink, LinkType, EnrichedProfile } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,11 @@ interface BioLinksEditorProps {
   onSaveSuccess?: (profile: EnrichedProfile) => void;
 }
 
+export interface BioLinksEditorRef {
+  save: () => Promise<boolean>;
+  hasChanges: () => boolean;
+}
+
 const MAX_BIO_LENGTH = 2000;
 const MAX_LINKS = 5;
 
@@ -20,17 +25,6 @@ const LINK_TYPE_OPTIONS: { value: LinkType; label: string; placeholder: string }
   { value: "X", label: "X / Twitter", placeholder: "https://x.com/username" },
   { value: "OTHER", label: "Other", placeholder: "https://example.com" },
 ];
-
-function getLinkTypeIcon(type: LinkType): string {
-  switch (type) {
-    case "LINKEDIN":
-      return "linkedin";
-    case "X":
-      return "twitter";
-    default:
-      return "link";
-  }
-}
 
 function validateUrl(url: string, type: LinkType): string | null {
   if (!url.trim()) {
@@ -61,23 +55,65 @@ function validateUrl(url: string, type: LinkType): string | null {
   }
 }
 
-export function BioLinksEditor({
-  initialBio,
-  initialLinks,
-  onSaveSuccess,
-}: BioLinksEditorProps) {
+export const BioLinksEditor = forwardRef<BioLinksEditorRef, BioLinksEditorProps>(
+  function BioLinksEditor({ initialBio, initialLinks, onSaveSuccess }, ref) {
   const [bio, setBio] = useState(initialBio || "");
   const [links, setLinks] = useState<FounderLink[]>(initialLinks || []);
-  const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [hasChanges, setHasChanges] = useState(false);
+  const [hasChangesState, setHasChangesState] = useState(false);
 
   // Track changes
   useEffect(() => {
     const bioChanged = bio !== (initialBio || "");
     const linksChanged = JSON.stringify(links) !== JSON.stringify(initialLinks || []);
-    setHasChanges(bioChanged || linksChanged);
+    setHasChangesState(bioChanged || linksChanged);
   }, [bio, links, initialBio, initialLinks]);
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Validate bio length
+    if (bio.length > MAX_BIO_LENGTH) {
+      newErrors.bio = `Bio must be ${MAX_BIO_LENGTH} characters or less`;
+    }
+
+    // Validate links
+    links.forEach((link, index) => {
+      const error = validateUrl(link.url, link.type);
+      if (error) {
+        newErrors[`link-${index}`] = error;
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const save = async (): Promise<boolean> => {
+    if (!hasChangesState) return true; // Nothing to save
+    if (!validate()) return false;
+
+    try {
+      const result = await meApi.updateEnrichedProfile({
+        bio: bio.trim() || null,
+        links: links.length > 0 ? links : null,
+      });
+      
+      setHasChangesState(false);
+      onSaveSuccess?.(result);
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to update bio and links";
+      showToast.error(message);
+      return false;
+    }
+  };
+
+  // Expose methods to parent
+  useImperativeHandle(ref, () => ({
+    save,
+    hasChanges: () => hasChangesState,
+  }));
 
   const handleAddLink = () => {
     if (links.length >= MAX_LINKS) {
@@ -115,57 +151,10 @@ export function BioLinksEditor({
     }
   };
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    // Validate bio length
-    if (bio.length > MAX_BIO_LENGTH) {
-      newErrors.bio = `Bio must be ${MAX_BIO_LENGTH} characters or less`;
-    }
-
-    // Validate links
-    links.forEach((link, index) => {
-      const error = validateUrl(link.url, link.type);
-      if (error) {
-        newErrors[`link-${index}`] = error;
-      }
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSave = async () => {
-    if (!validate()) return;
-
-    setIsSaving(true);
-    try {
-      const result = await meApi.updateEnrichedProfile({
-        bio: bio.trim() || null,
-        links: links.length > 0 ? links : null,
-      });
-      
-      showToast.success("Profile updated successfully");
-      setHasChanges(false);
-      onSaveSuccess?.(result);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update profile";
-      showToast.error(message);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleReset = () => {
-    setBio(initialBio || "");
-    setLinks(initialLinks || []);
-    setErrors({});
-  };
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Bio Section */}
-      <section>
+      <div>
         <div className="flex items-center justify-between mb-2">
           <label htmlFor="bio" className="text-sm font-medium text-ink">
             Bio
@@ -196,10 +185,10 @@ export function BioLinksEditor({
         <p className="mt-1 text-xs text-muted">
           Share your background, what your startup does, and what you're working on.
         </p>
-      </section>
+      </div>
 
       {/* Links Section */}
-      <section>
+      <div>
         <div className="flex items-center justify-between mb-4">
           <label className="text-sm font-medium text-ink">
             Links
@@ -269,23 +258,7 @@ export function BioLinksEditor({
             Add links to your LinkedIn, X/Twitter, or other profiles.
           </p>
         )}
-      </section>
-
-      {/* Save Actions */}
-      {hasChanges && (
-        <div className="flex items-center gap-4 pt-6 border-t border-line">
-          <Button onClick={handleSave} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save changes"}
-          </Button>
-          <button
-            type="button"
-            onClick={handleReset}
-            className="px-4 py-2 text-muted hover:text-ink transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   );
-}
+});

@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/context";
 import { meApi } from "@/lib/api/me";
 import { getStages, getSectors } from "@/lib/api/lookups";
-import { Icon, Input, Button, PageLoader, ApiErrorDisplay, showToast, BioLinksEditor, PitchDeckUpload } from "@/components/ui";
+import { Icon, Input, Button, PageLoader, showToast, PitchDeckUpload } from "@/components/ui";
+import { BioLinksEditor, BioLinksEditorRef } from "@/components/ui/bio-links-editor";
 import type { LookupResponse, ProfilePatchRequest, PitchDeckResponse } from "@/lib/api/types";
 
 export default function ProfileEditPage() {
   const router = useRouter();
   const { user, refreshUser } = useAuth();
+  const bioLinksRef = useRef<BioLinksEditorRef>(null);
   
   // Form state
   const [founderName, setFounderName] = useState("");
@@ -123,7 +125,17 @@ export default function ProfileEditPage() {
         website: website.trim() || undefined,
       };
       
-      await meApi.updateProfile(data);
+      // Save main profile and bio/links in parallel
+      const [, bioLinksSaved] = await Promise.all([
+        meApi.updateProfile(data),
+        bioLinksRef.current?.save() ?? true,
+      ]);
+      
+      if (!bioLinksSaved) {
+        // Bio/links validation failed, don't navigate
+        return;
+      }
+      
       await refreshUser();
       
       showToast.success("Profile updated successfully");
@@ -317,12 +329,9 @@ export default function ProfileEditPage() {
             Bio & Links
           </h2>
           <BioLinksEditor
+            ref={bioLinksRef}
             initialBio={user.profile?.bio || ""}
             initialLinks={user.profile?.links || []}
-            onSaveSuccess={() => {
-              refreshUser();
-              showToast.success("Bio and links updated");
-            }}
           />
         </section>
 
