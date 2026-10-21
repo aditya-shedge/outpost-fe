@@ -75,6 +75,9 @@ export default function ProfileEditPage() {
     if (!sectorId) {
       newErrors.sectorId = "Sector is required";
     }
+    if (!city.trim()) {
+      newErrors.city = "City is required";
+    }
     if (website && !isValidUrl(website)) {
       newErrors.website = "Please enter a valid URL";
     }
@@ -105,7 +108,7 @@ export default function ProfileEditPage() {
         startupName: startupName.trim(),
         stageId,
         sectorId,
-        city: city.trim() || undefined,
+        city: city.trim(),
         website: website.trim() || undefined,
       };
       
@@ -244,14 +247,18 @@ export default function ProfileEditPage() {
           <div className="space-y-4">
             <div>
               <label htmlFor="city" className="block text-sm font-medium text-ink mb-1">
-                City
+                City <span className="text-red-500">*</span>
               </label>
               <Input
                 id="city"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="e.g., Hyderabad"
+                error={!!errors.city}
               />
+              {errors.city && (
+                <p className="mt-1 text-sm text-red-500">{errors.city}</p>
+              )}
             </div>
             
             <div>

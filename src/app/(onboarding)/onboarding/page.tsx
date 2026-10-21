@@ -63,7 +63,7 @@ export default function OnboardingPage() {
         startupName: formData.startupName,
         stageId: formData.stageId,
         sectorId: formData.sectorId,
-        city: formData.city || undefined,
+        city: formData.city,
         website: formData.website || undefined,
       });
 
@@ -83,7 +83,8 @@ export default function OnboardingPage() {
   // Step validation
   const isStep1Valid = formData.founderName.trim() !== "" && formData.startupName.trim() !== "";
   const isStep2Valid = formData.stageId !== "" && formData.sectorId !== "";
-  const isFormValid = isStep1Valid && isStep2Valid;
+  const isStep3Valid = formData.city.trim() !== "";
+  const isFormValid = isStep1Valid && isStep2Valid && isStep3Valid;
 
   // Update current step based on filled fields
   useEffect(() => {
@@ -288,7 +289,7 @@ export default function OnboardingPage() {
         <div className="space-y-4 pt-4 border-t border-line">
           <div className="flex items-center gap-2 text-xs font-medium text-muted uppercase tracking-wider">
             <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${isStep2Valid ? 'bg-ink text-paper-light' : 'bg-line text-muted'}`}>3</span>
-            Location (optional)
+            Location
           </div>
           
           <div>
@@ -296,7 +297,7 @@ export default function OnboardingPage() {
               htmlFor="city"
               className="block text-sm font-medium text-ink mb-1.5"
             >
-              City
+              City <span className="text-rose">*</span>
             </label>
             <Input
               type="text"
@@ -304,6 +305,7 @@ export default function OnboardingPage() {
               name="city"
               value={formData.city}
               onChange={handleChange}
+              required
               placeholder="Hyderabad"
             />
           </div>

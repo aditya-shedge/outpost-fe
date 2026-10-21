@@ -117,6 +117,7 @@ describe("Onboarding Page (FE-014)", () => {
     await user.type(screen.getByLabelText(/startup name/i), "Acme Inc");
     await user.selectOptions(screen.getByLabelText(/stage/i), "stage-1");
     await user.selectOptions(screen.getByLabelText(/sector/i), "sector-1");
+    await user.type(screen.getByLabelText(/city/i), "Hyderabad");
     
     const submitButton = screen.getByRole("button", { name: /complete setup/i });
     expect(submitButton).not.toBeDisabled();
@@ -133,6 +134,7 @@ describe("Onboarding Page (FE-014)", () => {
     await user.type(screen.getByLabelText(/startup name/i), "Acme Inc");
     await user.selectOptions(screen.getByLabelText(/stage/i), "stage-1");
     await user.selectOptions(screen.getByLabelText(/sector/i), "sector-1");
+    await user.type(screen.getByLabelText(/city/i), "Hyderabad");
     
     await user.click(screen.getByRole("button", { name: /complete setup/i }));
     
@@ -142,7 +144,7 @@ describe("Onboarding Page (FE-014)", () => {
         startupName: "Acme Inc",
         stageId: "stage-1",
         sectorId: "sector-1",
-        city: undefined,
+        city: "Hyderabad",
         website: undefined,
       });
     });
