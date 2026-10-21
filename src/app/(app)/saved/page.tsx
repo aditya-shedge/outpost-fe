@@ -198,13 +198,9 @@ export default function SavedPage() {
             {filteredItems.map((item) => (
               <div key={`${item.type}-${item.data.id}`}>
                 {item.type === "grant" ? (
-                  <Link href={`/grants/${item.data.id}`}>
-                    <GrantCard grant={item.data} showAiReason={false} />
-                  </Link>
+                  <GrantCard grant={item.data} showAiReason={false} />
                 ) : (
-                  <Link href={`/challenges/${item.data.id}`}>
-                    <ChallengeCard challenge={item.data} showAiReason={false} />
-                  </Link>
+                  <ChallengeCard challenge={item.data} showAiReason={false} />
                 )}
                 <p className="mt-2 text-xs text-muted">
                   Saved {formatSavedDate(item.savedAt)}
