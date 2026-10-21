@@ -230,6 +230,17 @@ export function Header() {
                 
                 {/* Menu items */}
                 <div className="py-1">
+                  {user?.role === "ADMIN" && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-ink hover:bg-paper transition-colors"
+                      role="menuitem"
+                    >
+                      <AdminIcon className="w-4 h-4 text-muted" />
+                      Admin Dashboard
+                    </Link>
+                  )}
                   <Link
                     href="/profile"
                     onClick={() => setMenuOpen(false)}
@@ -340,6 +351,25 @@ function LogoutIcon({ className }: { className?: string }) {
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
+function AdminIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="3" width="7" height="9" />
+      <rect x="14" y="3" width="7" height="5" />
+      <rect x="14" y="12" width="7" height="9" />
+      <rect x="3" y="16" width="7" height="5" />
     </svg>
   );
 }

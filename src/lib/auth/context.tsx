@@ -81,6 +81,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           router.push("/verify-email");
         } else if (!user.onboarded) {
           router.push("/onboarding");
+        } else if (user.role === "ADMIN") {
+          router.push("/admin");
         } else {
           router.push("/discover");
         }
