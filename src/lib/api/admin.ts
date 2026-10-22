@@ -192,3 +192,22 @@ export async function updateMentor(id: string, data: Partial<MentorAdminResponse
 export async function deleteMentor(id: string): Promise<void> {
   await api.delete(`/api/v1/admin/mentors/${id}`);
 }
+
+
+// ============================================
+// Admin AI Settings API
+// ============================================
+
+export interface AiFeatureFlags {
+  grants?: boolean;
+  challenges?: boolean;
+  mentors?: boolean;
+}
+
+export async function getAiSettings(): Promise<AiFeatureFlags> {
+  return api.get<AiFeatureFlags>("/api/v1/admin/settings/ai");
+}
+
+export async function updateAiSettings(data: AiFeatureFlags): Promise<AiFeatureFlags> {
+  return api.put<AiFeatureFlags>("/api/v1/admin/settings/ai", data);
+}

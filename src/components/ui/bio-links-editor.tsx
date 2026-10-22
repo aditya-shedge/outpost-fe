@@ -79,7 +79,7 @@ export const BioLinksEditor = forwardRef<BioLinksEditorRef, BioLinksEditorProps>
 
     // Validate links
     links.forEach((link, index) => {
-      const error = validateUrl(link.url, link.type);
+      const error = validateUrl(link.url || "", link.type);
       if (error) {
         newErrors[`link-${index}`] = error;
       }

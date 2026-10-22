@@ -72,7 +72,7 @@ export type ProfileVisibility = "PRIVATE" | "THUB" | "PUBLIC";
 
 export interface FounderLink {
   type: LinkType;
-  url: string;
+  url?: string;
 }
 
 export interface ProfileResponse {
@@ -98,9 +98,8 @@ export interface EnrichedProfile {
 // ============================================
 
 // User extends FounderResponse with profile (included in /me response)
-export type User = FounderResponse & {
-  profile?: ProfileResponse;
-};
+// Note: profile is now included in FounderResponse from generated types
+export type User = FounderResponse;
 export type Stage = LookupResponse;
 export type Sector = LookupResponse;
 export type Grant = GrantDetailResponse;

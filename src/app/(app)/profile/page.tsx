@@ -209,7 +209,7 @@ export default function ProfilePage() {
                     {link.type === "X" && <XIcon className="w-4 h-4" />}
                     {link.type === "OTHER" && <Icon name="external-link" className="w-4 h-4 text-muted" />}
                     <span className="text-ink">
-                      {link.type === "LINKEDIN" ? "LinkedIn" : link.type === "X" ? "X / Twitter" : new URL(link.url).hostname}
+                      {link.type === "LINKEDIN" ? "LinkedIn" : link.type === "X" ? "X / Twitter" : link.url ? new URL(link.url).hostname : "Link"}
                     </span>
                   </a>
                 ))}

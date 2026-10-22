@@ -4,6 +4,31 @@
  */
 
 export interface paths {
+    "/api/v1/me/pitch-deck": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get pitch deck download URL
+         * @description Returns a 302 redirect to a presigned URL valid for 10 minutes.
+         */
+        get: operations["get"];
+        /**
+         * Upload or replace pitch deck
+         * @description PDF only (magic bytes validated). Max 10 MB. Replaces existing deck if present.
+         */
+        put: operations["upload"];
+        post?: never;
+        /** Delete pitch deck */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/password": {
         parameters: {
             query?: never;
@@ -21,6 +46,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/settings/ai": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get AI feature flags per module */
+        get: operations["getAiSettings"];
+        /** Update AI feature flags — disabling a module ignores ai=true on that listing */
+        put: operations["updateAiSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/partners/{id}": {
         parameters: {
             query?: never;
@@ -29,12 +72,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get a partner by id */
-        get: operations["get"];
+        get: operations["get_1"];
         /** Update a partner */
         put: operations["update"];
         post?: never;
         /** Delete a partner */
-        delete: operations["delete"];
+        delete: operations["delete_1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -48,12 +91,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get an offer by id */
-        get: operations["get_1"];
+        get: operations["get_2"];
         /** Update an offer */
         put: operations["update_1"];
         post?: never;
         /** Delete an offer */
-        delete: operations["delete_1"];
+        delete: operations["delete_2"];
         options?: never;
         head?: never;
         patch?: never;
@@ -75,7 +118,7 @@ export interface paths {
          * Soft-delete a mentor
          * @description Sets published=false and deleted=true. Row is never removed — application FK and audit history are preserved. Trade-off: table grows indefinitely; archive job out of scope for V1.
          */
-        delete: operations["delete_2"];
+        delete: operations["delete_3"];
         options?: never;
         head?: never;
         patch?: never;
@@ -124,10 +167,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_2"];
+        get: operations["get_3"];
         put: operations["update_3"];
         post?: never;
-        delete: operations["delete_3"];
+        delete: operations["delete_4"];
         options?: never;
         head?: never;
         patch?: never;
@@ -141,12 +184,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get a challenge by id */
-        get: operations["get_3"];
+        get: operations["get_4"];
         /** Update a challenge */
         put: operations["update_4"];
         post?: never;
         /** Delete a challenge */
-        delete: operations["delete_4"];
+        delete: operations["delete_5"];
         options?: never;
         head?: never;
         patch?: never;
@@ -658,7 +701,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get current founder profile */
-        get: operations["get_4"];
+        get: operations["get_5"];
         put?: never;
         post?: never;
         delete?: never;
@@ -669,6 +712,26 @@ export interface paths {
          * @description JSON Merge Patch semantics. Absent fields are not modified. Pass null to clear optional fields (e.g. website). Email is not editable — changing email requires re-verification and is out of scope.
          */
         patch: operations["patch"];
+        trace?: never;
+    };
+    "/api/v1/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update bio and links
+         * @description Partial update — omitted fields are not modified.
+         */
+        patch: operations["updateProfile"];
         trace?: never;
     };
     "/api/v1/mentors": {
@@ -804,6 +867,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/founders/{id}/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a founder's enriched profile
+         * @description Returns bio, links, startup name and city. Pitch deck not included. Visibility THUB/PRIVATE: only self and admins can read.
+         */
+        get: operations["getProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/founders/me": {
         parameters: {
             query?: never;
@@ -912,6 +995,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/founders/{id}/pitch-deck": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get any founder's pitch deck download URL */
+        get: operations["getPitchDeck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/identities/{provider}": {
         parameters: {
             query?: never;
@@ -933,9 +1033,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        PitchDeckResponse: {
+            fileName?: string;
+            /** Format: int64 */
+            sizeBytes?: number;
+            /** Format: date-time */
+            uploadedAt?: string;
+        };
         ChangePasswordRequest: {
             currentPassword?: string;
             newPassword?: string;
+        };
+        AiFeatureFlags: {
+            mentors?: boolean;
+            challenges?: boolean;
+            grants?: boolean;
         };
         PartnerRequest: {
             name?: string;
@@ -1226,6 +1338,24 @@ export interface components {
             onboarded?: boolean;
             /** @enum {string} */
             role?: "FOUNDER" | "ADMIN";
+            profile?: components["schemas"]["ProfileResponse"];
+        };
+        ProfileLink: {
+            /** @enum {string} */
+            type: "LINKEDIN" | "X" | "OTHER";
+            url?: string;
+        };
+        ProfileResponse: {
+            bio?: string;
+            links?: components["schemas"]["ProfileLink"][];
+            /** @enum {string} */
+            visibility?: "PRIVATE" | "THUB" | "PUBLIC";
+        };
+        UpdateProfileRequest: {
+            bio?: string;
+            links?: components["schemas"]["ProfileLink"][];
+            /** @enum {string} */
+            visibility?: "PRIVATE" | "THUB" | "PUBLIC";
         };
         IdentityResponse: {
             provider?: string;
@@ -1250,6 +1380,12 @@ export interface components {
             expired?: boolean;
             stages?: string[];
             sectors?: string[];
+        };
+        PublicProfileResponse: {
+            bio?: string;
+            links?: components["schemas"]["ProfileLink"][];
+            startupName?: string;
+            city?: string;
         };
         ApplyResponse: {
             applyUrl?: string;
@@ -1300,6 +1436,157 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    get: {
+        parameters: {
+            query?: {
+                id?: string;
+                email?: string;
+                emailVerified?: boolean;
+                passwordHash?: string;
+                founderName?: string;
+                startupName?: string;
+                "stage.id"?: string;
+                "stage.name"?: string;
+                "stage.sortOrder"?: number;
+                "stage.active"?: boolean;
+                "sector.id"?: string;
+                "sector.name"?: string;
+                "sector.sortOrder"?: number;
+                "sector.active"?: boolean;
+                city?: string;
+                website?: string;
+                onboarded?: boolean;
+                role?: "FOUNDER" | "ADMIN";
+                createdAt?: string;
+                updatedAt?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to presigned URL */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No pitch deck uploaded */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    upload: {
+        parameters: {
+            query?: {
+                id?: string;
+                email?: string;
+                emailVerified?: boolean;
+                passwordHash?: string;
+                founderName?: string;
+                startupName?: string;
+                "stage.id"?: string;
+                "stage.name"?: string;
+                "stage.sortOrder"?: number;
+                "stage.active"?: boolean;
+                "sector.id"?: string;
+                "sector.name"?: string;
+                "sector.sortOrder"?: number;
+                "sector.active"?: boolean;
+                city?: string;
+                website?: string;
+                onboarded?: boolean;
+                role?: "FOUNDER" | "ADMIN";
+                createdAt?: string;
+                updatedAt?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Uploaded successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PitchDeckResponse"];
+                };
+            };
+            /** @description File exceeds 10 MB limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PitchDeckResponse"];
+                };
+            };
+            /** @description File is not a valid PDF */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PitchDeckResponse"];
+                };
+            };
+        };
+    };
+    delete: {
+        parameters: {
+            query?: {
+                id?: string;
+                email?: string;
+                emailVerified?: boolean;
+                passwordHash?: string;
+                founderName?: string;
+                startupName?: string;
+                "stage.id"?: string;
+                "stage.name"?: string;
+                "stage.sortOrder"?: number;
+                "stage.active"?: boolean;
+                "sector.id"?: string;
+                "sector.name"?: string;
+                "sector.sortOrder"?: number;
+                "sector.active"?: boolean;
+                city?: string;
+                website?: string;
+                onboarded?: boolean;
+                role?: "FOUNDER" | "ADMIN";
+                createdAt?: string;
+                updatedAt?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted successfully */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No pitch deck to delete */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     changePassword: {
         parameters: {
             query?: {
@@ -1350,7 +1637,51 @@ export interface operations {
             };
         };
     };
-    get: {
+    getAiSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AiFeatureFlags"];
+                };
+            };
+        };
+    };
+    updateAiSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiFeatureFlags"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AiFeatureFlags"];
+                };
+            };
+        };
+    };
+    get_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1416,7 +1747,7 @@ export interface operations {
             };
         };
     };
-    delete: {
+    delete_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1443,7 +1774,7 @@ export interface operations {
             };
         };
     };
-    get_1: {
+    get_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -1509,7 +1840,7 @@ export interface operations {
             };
         };
     };
-    delete_1: {
+    delete_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -1602,7 +1933,7 @@ export interface operations {
             };
         };
     };
-    delete_2: {
+    delete_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -1746,7 +2077,7 @@ export interface operations {
             };
         };
     };
-    get_2: {
+    get_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -1794,7 +2125,7 @@ export interface operations {
             };
         };
     };
-    delete_3: {
+    delete_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -1814,7 +2145,7 @@ export interface operations {
             };
         };
     };
-    get_3: {
+    get_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -1889,7 +2220,7 @@ export interface operations {
             };
         };
     };
-    delete_4: {
+    delete_5: {
         parameters: {
             query?: never;
             header?: never;
@@ -2917,7 +3248,7 @@ export interface operations {
             };
         };
     };
-    get_4: {
+    get_5: {
         parameters: {
             query?: {
                 id?: string;
@@ -3017,6 +3348,60 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["FounderResponse"];
+                };
+            };
+        };
+    };
+    updateProfile: {
+        parameters: {
+            query?: {
+                id?: string;
+                email?: string;
+                emailVerified?: boolean;
+                passwordHash?: string;
+                founderName?: string;
+                startupName?: string;
+                "stage.id"?: string;
+                "stage.name"?: string;
+                "stage.sortOrder"?: number;
+                "stage.active"?: boolean;
+                "sector.id"?: string;
+                "sector.name"?: string;
+                "sector.sortOrder"?: number;
+                "sector.active"?: boolean;
+                city?: string;
+                website?: string;
+                onboarded?: boolean;
+                role?: "FOUNDER" | "ADMIN";
+                createdAt?: string;
+                updatedAt?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description Profile updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProfileResponse"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProfileResponse"];
                 };
             };
         };
@@ -3272,6 +3657,57 @@ export interface operations {
             };
         };
     };
+    getProfile: {
+        parameters: {
+            query?: {
+                email?: string;
+                emailVerified?: boolean;
+                passwordHash?: string;
+                founderName?: string;
+                startupName?: string;
+                "stage.id"?: string;
+                "stage.name"?: string;
+                "stage.sortOrder"?: number;
+                "stage.active"?: boolean;
+                "sector.id"?: string;
+                "sector.name"?: string;
+                "sector.sortOrder"?: number;
+                "sector.active"?: boolean;
+                city?: string;
+                website?: string;
+                onboarded?: boolean;
+                role?: "FOUNDER" | "ADMIN";
+                createdAt?: string;
+                updatedAt?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profile returned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicProfileResponse"];
+                };
+            };
+            /** @description Founder not found or not visible to requester */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicProfileResponse"];
+                };
+            };
+        };
+    };
     me: {
         parameters: {
             query?: {
@@ -3476,6 +3912,26 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["MentorAdminResponse"][];
                 };
+            };
+        };
+    };
+    getPitchDeck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
