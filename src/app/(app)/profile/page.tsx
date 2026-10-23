@@ -6,13 +6,14 @@ import { useAuth } from "@/lib/auth/context";
 import { meApi } from "@/lib/api/me";
 import { getStages, getSectors } from "@/lib/api/lookups";
 import { Icon, PageLoader, ApiErrorDisplay } from "@/components/ui";
-import type { IdentityResponse, LookupResponse } from "@/lib/api/types";
+import type { IdentityResponse, LookupResponse, PitchDeckResponse } from "@/lib/api/types";
 
 export default function ProfilePage() {
   const { user } = useAuth();
   const [identities, setIdentities] = useState<IdentityResponse[]>([]);
   const [stages, setStages] = useState<LookupResponse[]>([]);
   const [sectors, setSectors] = useState<LookupResponse[]>([]);
+  const [pitchDeck, setPitchDeck] = useState<PitchDeckResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -28,6 +29,14 @@ export default function ProfilePage() {
         setIdentities(identitiesData);
         setStages(stagesData);
         setSectors(sectorsData);
+        
+        // Fetch pitch deck separately (may not exist)
+        try {
+          const deckData = await meApi.hasPitchDeck();
+          setPitchDeck(deckData);
+        } catch {
+          // No pitch deck uploaded yet
+        }
       } catch (err) {
         setError(err instanceof Error ? err : new Error("Failed to load profile"));
       } finally {
@@ -219,6 +228,37 @@ export default function ProfilePage() {
             )}
           </div>
 
+          {/* Pitch Deck Card */}
+          <div className="bg-white border border-line p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
+              <PdfIcon className="w-4 h-4 text-green" />
+              Pitch Deck
+            </h2>
+            {pitchDeck?.fileName ? (
+              <a
+                href={meApi.getPitchDeckUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 bg-paper hover:bg-paper-light border border-line transition-colors"
+              >
+                <div className="w-10 h-10 bg-red-100 flex items-center justify-center rounded">
+                  <PdfIcon className="w-5 h-5 text-red-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-ink truncate">
+                    {pitchDeck.fileName}
+                  </p>
+                  <p className="text-xs text-muted">
+                    Click to view
+                  </p>
+                </div>
+                <Icon name="external-link" className="w-4 h-4 text-muted" />
+              </a>
+            ) : (
+              <p className="text-sm text-muted italic">No pitch deck uploaded yet.</p>
+            )}
+          </div>
+
           {/* Account Card */}
           <div className="bg-white border border-line p-5 shadow-sm">
             <h2 className="text-base font-semibold text-ink mb-3 flex items-center gap-2">
@@ -310,6 +350,18 @@ function XIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+function PdfIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
     </svg>
   );
 }
