@@ -83,11 +83,40 @@ export const meApi = {
 
   /**
    * Get pitch deck download URL
-   * Returns a redirect URL or throws 404 if no deck uploaded
+   * Returns the static URL path (for constructing links)
    */
   getPitchDeckUrl: (): string => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
     return `${baseUrl}/api/v1/me/pitch-deck`;
+  },
+
+  /**
+   * Get pitch deck presigned download URL
+   * Fetches with auth and follows redirect to get the actual S3 URL
+   */
+  getPitchDeckDownloadUrl: async (): Promise<string | null> => {
+    try {
+      const token = getAccessToken();
+      if (!token) return null;
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      
+      const response = await fetch(`${baseUrl}/api/v1/me/pitch-deck`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        redirect: "follow",
+      });
+      
+      if (response.ok) {
+        // The response.url will be the final URL after redirect
+        return response.url;
+      }
+      return null;
+    } catch {
+      return null;
+    }
   },
 
   /**

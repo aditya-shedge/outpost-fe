@@ -235,11 +235,18 @@ export default function ProfilePage() {
               Pitch Deck
             </h2>
             {pitchDeck?.fileName ? (
-              <a
-                href={meApi.getPitchDeckUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3 bg-paper hover:bg-paper-light border border-line transition-colors"
+              <button
+                onClick={async () => {
+                  try {
+                    const url = await meApi.getPitchDeckDownloadUrl();
+                    if (url) {
+                      window.open(url, "_blank");
+                    }
+                  } catch {
+                    // Error handled silently
+                  }
+                }}
+                className="w-full flex items-center gap-3 p-3 bg-paper hover:bg-paper-light border border-line transition-colors text-left"
               >
                 <div className="w-10 h-10 bg-red-100 flex items-center justify-center rounded">
                   <PdfIcon className="w-5 h-5 text-red-600" />
@@ -253,7 +260,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
                 <Icon name="external-link" className="w-4 h-4 text-muted" />
-              </a>
+              </button>
             ) : (
               <p className="text-sm text-muted italic">No pitch deck uploaded yet.</p>
             )}
