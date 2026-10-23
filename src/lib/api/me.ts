@@ -90,27 +90,24 @@ export const meApi = {
   },
 
   /**
-   * Check if pitch deck exists by trying to get info
-   * Note: The actual endpoint returns 302 or 404, so we need a HEAD or info endpoint
-   * For now, we'll just attempt to fetch and catch 404
+   * Check if pitch deck exists
+   * Uses HEAD request to check without downloading the file
    */
   hasPitchDeck: async (): Promise<PitchDeckResponse | null> => {
     try {
-      // The backend returns 302 redirect on GET, but we need metadata
-      // We'll attempt a HEAD request or use an info endpoint if available
-      // For now, return null and let the UI check via other means
-      const response = await fetch(meApi.getPitchDeckUrl(), {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const token = localStorage.getItem("accessToken");
+      
+      const response = await fetch(`${baseUrl}/api/v1/me/pitch-deck`, {
         method: "HEAD",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        redirect: "manual", // Don't follow redirect
       });
       
-      if (response.status === 302 || response.status === 200) {
-        // Pitch deck exists - but we don't have metadata from HEAD
-        // The actual metadata comes from the upload response
-        return { fileName: "pitch-deck.pdf" }; // Placeholder
+      // 2xx or 3xx means pitch deck exists
+      if (response.ok || (response.status >= 300 && response.status < 400)) {
+        return { fileName: "Pitch Deck.pdf" };
       }
       return null;
     } catch {
