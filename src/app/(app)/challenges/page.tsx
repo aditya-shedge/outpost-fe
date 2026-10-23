@@ -215,7 +215,7 @@ function ChallengesContent() {
                 }}
                 className="sr-only peer"
               />
-              <div className="w-9 h-5 bg-line peer-checked:bg-violet-600 transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:bg-white after:transition-transform peer-checked:after:translate-x-4" />
+              <div className="w-9 h-5 bg-line peer-checked:bg-orange-500 transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:bg-white after:transition-transform peer-checked:after:translate-x-4" />
               <span className="text-sm text-muted">
                 AI Ranking
               </span>
@@ -327,7 +327,7 @@ function ChallengesContent() {
           <button
             onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
             disabled={currentPage === 0}
-            className="px-4 py-2 text-sm border border-line bg-paper-light hover:bg-violet-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 text-sm border border-line bg-paper-light hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Previous
           </button>
@@ -351,8 +351,8 @@ function ChallengesContent() {
                   onClick={() => setCurrentPage(pageNum)}
                   className={`w-10 h-10 text-sm border transition-colors ${
                     currentPage === pageNum
-                      ? "bg-violet-600 text-white border-violet-600"
-                      : "border-line bg-paper-light hover:bg-violet-100"
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "border-line bg-paper-light hover:bg-orange-100"
                   }`}
                 >
                   {pageNum + 1}
@@ -364,7 +364,7 @@ function ChallengesContent() {
           <button
             onClick={() => setCurrentPage((p) => Math.min((page.totalPages ?? 1) - 1, p + 1))}
             disabled={currentPage === (page.totalPages ?? 1) - 1}
-            className="px-4 py-2 text-sm border border-line bg-paper-light hover:bg-violet-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 text-sm border border-line bg-paper-light hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Next
           </button>

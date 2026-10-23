@@ -212,7 +212,7 @@ export default function ChallengeDetailPage() {
             className={`inline-flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
               isClosed
                 ? "bg-muted/20 text-muted cursor-not-allowed pointer-events-none"
-                : "bg-violet-600 text-white hover:bg-violet-700"
+                : "bg-orange-500 text-white hover:bg-orange-600"
             }`}
             aria-disabled={isClosed}
           >
