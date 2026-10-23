@@ -11,6 +11,12 @@ export default function Home() {
           <Brand />
           <div className="flex items-center gap-4">
             <Link
+              href="/become-mentor"
+              className="px-4 py-2 text-sm font-medium text-ink hover:text-green transition-colors"
+            >
+              Become a Mentor
+            </Link>
+            <Link
               href="/login"
               className="px-4 py-2 text-sm font-medium text-ink hover:text-green transition-colors"
             >
