@@ -1,4 +1,5 @@
 import { api } from "./client";
+import { getAccessToken } from "@/lib/auth/storage";
 import type {
   FounderResponse,
   ProfilePatchRequest,
@@ -91,22 +92,24 @@ export const meApi = {
 
   /**
    * Check if pitch deck exists
-   * Uses HEAD request to check without downloading the file
+   * Attempts GET request - 302/200 means exists, 404 means not found
    */
   hasPitchDeck: async (): Promise<PitchDeckResponse | null> => {
     try {
+      const token = getAccessToken();
+      if (!token) return null;
+      
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const token = localStorage.getItem("accessToken");
       
       const response = await fetch(`${baseUrl}/api/v1/me/pitch-deck`, {
-        method: "HEAD",
+        method: "GET",
         headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          Authorization: `Bearer ${token}`,
         },
       });
       
-      // 2xx or 3xx means pitch deck exists
-      if (response.ok || (response.status >= 300 && response.status < 400)) {
+      // Any success means pitch deck exists
+      if (response.ok) {
         return { fileName: "Pitch Deck.pdf" };
       }
       return null;
