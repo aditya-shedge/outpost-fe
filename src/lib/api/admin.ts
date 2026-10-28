@@ -202,6 +202,7 @@ export interface AiFeatureFlags {
   grants?: boolean;
   challenges?: boolean;
   mentors?: boolean;
+  offers?: boolean;
 }
 
 export async function getAiSettings(): Promise<AiFeatureFlags> {
