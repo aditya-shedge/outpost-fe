@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { Badge } from "./badge";
 import { Skeleton } from "./skeleton";
 import type { Benefit } from "@/lib/api/benefits";
@@ -24,6 +25,31 @@ const categoryColors: Record<string, string> = {
   SERVICES: "bg-green-100 text-green-800",
 };
 
+function PartnerLogo({ logoUrl, name }: { logoUrl?: string; name?: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (!logoUrl || hasError) {
+    return name ? (
+      <span className="text-lg font-bold text-gold-dark">
+        {name.charAt(0)}
+      </span>
+    ) : (
+      <GiftIcon className="w-6 h-6 text-muted" />
+    );
+  }
+
+  return (
+    <Image
+      src={logoUrl}
+      alt={name || "Partner"}
+      width={48}
+      height={48}
+      className="w-full h-full object-contain"
+      onError={() => setHasError(true)}
+    />
+  );
+}
+
 export function BenefitCard({ benefit }: BenefitCardProps) {
   const isExpired = benefit.expired || (benefit.validUntil && new Date(benefit.validUntil) < new Date());
 
@@ -38,21 +64,7 @@ export function BenefitCard({ benefit }: BenefitCardProps) {
       <div className="flex items-start gap-4 mb-4">
         {/* Partner Logo */}
         <div className="shrink-0 w-12 h-12 rounded-lg bg-paper border border-line flex items-center justify-center overflow-hidden">
-          {benefit.partner?.logoUrl ? (
-            <Image
-              src={benefit.partner.logoUrl}
-              alt={benefit.partner.name || "Partner"}
-              width={48}
-              height={48}
-              className="w-full h-full object-contain"
-            />
-          ) : benefit.partner?.name ? (
-            <span className="text-lg font-bold text-gold-dark">
-              {benefit.partner.name.charAt(0)}
-            </span>
-          ) : (
-            <GiftIcon className="w-6 h-6 text-muted" />
-          )}
+          <PartnerLogo logoUrl={benefit.partner?.logoUrl} name={benefit.partner?.name} />
         </div>
 
         <div className="flex-1 min-w-0">

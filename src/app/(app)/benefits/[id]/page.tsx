@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getBenefit } from "@/lib/api/benefits";
 import type { Benefit } from "@/lib/api/benefits";
 import { Icon, Badge, PageLoader, Button } from "@/components/ui";
@@ -13,6 +14,29 @@ const categoryLabels: Record<string, string> = {
   BUSINESS_TOOLS: "Business Tools",
   SERVICES: "Services",
 };
+
+function PartnerLogo({ logoUrl, name, size = 64 }: { logoUrl?: string; name?: string; size?: number }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (!logoUrl || hasError) {
+    return (
+      <span className="text-2xl font-bold text-gold-dark">
+        {name?.charAt(0) || "P"}
+      </span>
+    );
+  }
+
+  return (
+    <Image
+      src={logoUrl}
+      alt={name || "Partner"}
+      width={size}
+      height={size}
+      className="w-full h-full object-contain"
+      onError={() => setHasError(true)}
+    />
+  );
+}
 
 export default function BenefitDetailPage() {
   const params = useParams();
@@ -81,17 +105,7 @@ export default function BenefitDetailPage() {
       {/* Partner Branding */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-16 h-16 rounded-lg bg-paper border border-line flex items-center justify-center overflow-hidden">
-          {benefit.partner?.logoUrl ? (
-            <img
-              src={benefit.partner.logoUrl}
-              alt={benefit.partner.name || "Partner"}
-              className="w-full h-full object-contain"
-            />
-          ) : (
-            <span className="text-2xl font-bold text-gold-dark">
-              {benefit.partner?.name?.charAt(0) || "P"}
-            </span>
-          )}
+          <PartnerLogo logoUrl={benefit.partner?.logoUrl} name={benefit.partner?.name} size={64} />
         </div>
         <div>
           <p className="text-sm text-muted mb-1">Offered by</p>
