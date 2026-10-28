@@ -69,13 +69,12 @@ export async function getBenefits(
 ): Promise<PaginatedResponse<Benefit>> {
   const queryString = buildQueryString(params);
   try {
-    const response = await api.get<BenefitsListResponse>(`/api/v1/benefits${queryString}`);
+    const response = await api.get<BenefitsListResponse>(`/api/v1/offers${queryString}`);
     return {
       content: response?.content || [],
       page: response?.page || { number: 0, size: 20, totalElements: 0, totalPages: 0 },
     };
   } catch (error) {
-    // Return empty result if endpoint doesn't exist
     const apiError = error as { status?: number };
     if (apiError?.status === 404) {
       return { content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } };
@@ -89,7 +88,7 @@ export async function getBenefits(
  */
 export async function getBenefit(id: string): Promise<Benefit | null> {
   try {
-    const response = await api.get<Benefit>(`/api/v1/benefits/${id}`);
+    const response = await api.get<Benefit>(`/api/v1/offers/${id}`);
     return response;
   } catch (error) {
     const apiError = error as { status?: number };
@@ -105,10 +104,9 @@ export async function getBenefit(id: string): Promise<Benefit | null> {
  */
 export async function getFeaturedPartners(): Promise<Partner[]> {
   try {
-    const response = await api.get<Partner[]>("/api/v1/benefits/featured");
+    const response = await api.get<Partner[]>("/api/v1/offers/featured");
     return response || [];
   } catch (error) {
-    // Return empty array if endpoint doesn't exist
     const apiError = error as { status?: number };
     if (apiError?.status === 404) {
       return [];
@@ -120,17 +118,8 @@ export async function getFeaturedPartners(): Promise<Partner[]> {
 
 /**
  * Get all partners (for filter dropdown)
+ * Uses the featured endpoint since there's no separate partners list
  */
 export async function getPartners(): Promise<Partner[]> {
-  try {
-    const response = await api.get<{ content: Partner[] }>("/api/v1/partners");
-    return response?.content || [];
-  } catch (error) {
-    const apiError = error as { status?: number };
-    if (apiError?.status === 404) {
-      return [];
-    }
-    console.error("Failed to fetch partners:", error);
-    return [];
-  }
+  return getFeaturedPartners();
 }
