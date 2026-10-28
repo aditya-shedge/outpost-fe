@@ -214,28 +214,30 @@ export default function BenefitsPage() {
       {/* Toggle Row */}
       <div className="flex flex-wrap items-center gap-6 mb-6">
         {/* AI Toggle */}
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={aiParam}
-            onChange={(e) => updateFilters({ ai: e.target.checked ? "true" : null })}
-            className="sr-only peer"
-          />
-          <div className="w-9 h-5 bg-line peer-checked:bg-gold rounded-full relative transition-colors">
+        <label className="flex items-center gap-2 cursor-pointer group">
+          <div className="relative">
+            <input
+              type="checkbox"
+              checked={aiParam}
+              onChange={(e) => updateFilters({ ai: e.target.checked ? "true" : null })}
+              className="sr-only peer"
+            />
+            <div className="w-9 h-5 bg-line peer-checked:bg-gold rounded-full transition-colors" />
             <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
           </div>
           <span className="text-sm text-ink">AI recommendations</span>
         </label>
 
         {/* Show Expired Toggle */}
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showExpiredParam}
-            onChange={(e) => updateFilters({ showExpired: e.target.checked ? "true" : null })}
-            className="sr-only peer"
-          />
-          <div className="w-9 h-5 bg-line peer-checked:bg-gold rounded-full relative transition-colors">
+        <label className="flex items-center gap-2 cursor-pointer group">
+          <div className="relative">
+            <input
+              type="checkbox"
+              checked={showExpiredParam}
+              onChange={(e) => updateFilters({ showExpired: e.target.checked ? "true" : null })}
+              className="sr-only peer"
+            />
+            <div className="w-9 h-5 bg-line peer-checked:bg-gold rounded-full transition-colors" />
             <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
           </div>
           <span className="text-sm text-ink">Show expired</span>
