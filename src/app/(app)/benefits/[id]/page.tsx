@@ -65,7 +65,7 @@ export default function BenefitDetailPage() {
     );
   }
 
-  const isExpired = benefit.validUntil && new Date(benefit.validUntil) < new Date();
+  const isExpired = benefit.expired || (benefit.validUntil && new Date(benefit.validUntil) < new Date());
 
   return (
     <div className="max-w-[800px] mx-auto py-12 px-7">
@@ -80,14 +80,22 @@ export default function BenefitDetailPage() {
 
       {/* Partner Branding */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 rounded-lg bg-paper border border-line flex items-center justify-center">
-          <span className="text-2xl font-bold text-gold-dark">
-            {benefit.partnerName?.charAt(0) || "P"}
-          </span>
+        <div className="w-16 h-16 rounded-lg bg-paper border border-line flex items-center justify-center overflow-hidden">
+          {benefit.partner?.logoUrl ? (
+            <img
+              src={benefit.partner.logoUrl}
+              alt={benefit.partner.name || "Partner"}
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <span className="text-2xl font-bold text-gold-dark">
+              {benefit.partner?.name?.charAt(0) || "P"}
+            </span>
+          )}
         </div>
         <div>
           <p className="text-sm text-muted mb-1">Offered by</p>
-          <p className="font-semibold text-ink">{benefit.partnerName}</p>
+          <p className="font-semibold text-ink">{benefit.partner?.name}</p>
         </div>
       </div>
 

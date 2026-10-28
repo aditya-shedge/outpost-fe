@@ -14,8 +14,7 @@ const mockGetBenefit = benefitsApi.getBenefit as jest.MockedFunction<typeof bene
 
 const mockBenefit: benefitsApi.Benefit = {
   id: "benefit-123",
-  partnerId: "partner-1",
-  partnerName: "AWS",
+  partner: { id: "partner-1", name: "AWS", website: "https://aws.amazon.com" },
   headline: "$5,000 in AWS credits",
   category: "CLOUD",
   whatYouGet: "Credits for cloud computing services",
@@ -24,6 +23,7 @@ const mockBenefit: benefitsApi.Benefit = {
   claimUrl: "https://aws.amazon.com/activate",
   claimCode: "THUB2024",
   validUntil: "2027-12-31",
+  expired: false,
 };
 
 describe("BenefitDetailPage", () => {

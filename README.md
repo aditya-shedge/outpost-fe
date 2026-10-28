@@ -76,4 +76,3 @@ npm run lint     # Run ESLint
 ## Related
 
 - [Backend API](../outpost-aditya) - Spring Boot REST API
-- [API Reference](../outpost-aditya/docs/API_REFERENCE.md)

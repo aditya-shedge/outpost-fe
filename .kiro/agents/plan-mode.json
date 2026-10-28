@@ -19,7 +19,8 @@
   "resources": [
     "file://../artifacts/**/*.md",
     "file://./guidelines/**/*.md",
-    "file://./docs/API_REFERENCE.md"
+    "file://./README.md"
+
   ],
   "hooks": {},
   "useLegacyMcpJson": true,

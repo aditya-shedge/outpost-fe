@@ -1,10 +1,32 @@
 import { api } from "./client";
-import type { OfferResponse, PartnerResponse, PaginatedResponse, PageMetadata } from "./types";
+import type { PaginatedResponse, PageMetadata } from "./types";
 
-// Re-export types for convenience
-export type Benefit = OfferResponse;
-export type Partner = PartnerResponse;
-export type BenefitCategory = NonNullable<OfferResponse["category"]>;
+// Types based on backend response shapes
+export interface Partner {
+  id?: string;
+  name?: string;
+  logoUrl?: string;
+  website?: string;
+  publishedOfferCount?: number;
+}
+
+export interface Benefit {
+  id?: string;
+  partner?: Partner;
+  headline?: string;
+  category?: "CLOUD" | "DEV_TOOLS" | "BUSINESS_TOOLS" | "SERVICES";
+  eligibilityNote?: string;
+  whatYouGet?: string;
+  howToClaim?: string;
+  claimUrl?: string;
+  claimCode?: string | null;
+  validUntil?: string;
+  expired?: boolean;
+  aiApplied?: boolean;
+  aiReason?: string;
+}
+
+export type BenefitCategory = NonNullable<Benefit["category"]>;
 
 export interface BenefitsListParams {
   page?: number;
@@ -83,8 +105,8 @@ export async function getBenefit(id: string): Promise<Benefit | null> {
  */
 export async function getFeaturedPartners(): Promise<Partner[]> {
   try {
-    const response = await api.get<{ content: Partner[] }>("/api/v1/benefits/featured");
-    return response?.content || [];
+    const response = await api.get<Partner[]>("/api/v1/benefits/featured");
+    return response || [];
   } catch (error) {
     // Return empty array if endpoint doesn't exist
     const apiError = error as { status?: number };

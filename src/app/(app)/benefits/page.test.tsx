@@ -19,27 +19,27 @@ const mockGetPartners = benefitsApi.getPartners as jest.MockedFunction<typeof be
 const mockBenefits: benefitsApi.Benefit[] = [
   {
     id: "benefit-1",
-    partnerId: "partner-1",
-    partnerName: "AWS",
+    partner: { id: "partner-1", name: "AWS" },
     headline: "$5,000 in AWS credits",
     category: "CLOUD",
-    whatYouGet: "Credits for cloud services",
+    eligibilityNote: "For early-stage startups",
     validUntil: "2027-12-31",
+    expired: false,
   },
   {
     id: "benefit-2",
-    partnerId: "partner-2",
-    partnerName: "Notion",
+    partner: { id: "partner-2", name: "Notion" },
     headline: "Free Notion Plus",
     category: "BUSINESS_TOOLS",
-    whatYouGet: "Unlimited blocks and members",
+    eligibilityNote: "For teams up to 50",
     validUntil: "2027-06-30",
+    expired: false,
   },
 ];
 
 const mockPartners: benefitsApi.Partner[] = [
-  { id: "partner-1", name: "AWS", featured: true },
-  { id: "partner-2", name: "Notion", featured: true },
+  { id: "partner-1", name: "AWS", publishedOfferCount: 3 },
+  { id: "partner-2", name: "Notion", publishedOfferCount: 1 },
 ];
 
 describe("BenefitsPage", () => {

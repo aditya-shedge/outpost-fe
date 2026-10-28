@@ -25,7 +25,7 @@ const categoryColors: Record<string, string> = {
 };
 
 export function BenefitCard({ benefit }: BenefitCardProps) {
-  const isExpired = benefit.validUntil && new Date(benefit.validUntil) < new Date();
+  const isExpired = benefit.expired || (benefit.validUntil && new Date(benefit.validUntil) < new Date());
 
   return (
     <Link
@@ -36,11 +36,19 @@ export function BenefitCard({ benefit }: BenefitCardProps) {
     >
       {/* Header */}
       <div className="flex items-start gap-4 mb-4">
-        {/* Partner Logo Placeholder */}
+        {/* Partner Logo */}
         <div className="shrink-0 w-12 h-12 rounded-lg bg-paper border border-line flex items-center justify-center overflow-hidden">
-          {benefit.partnerName ? (
+          {benefit.partner?.logoUrl ? (
+            <Image
+              src={benefit.partner.logoUrl}
+              alt={benefit.partner.name || "Partner"}
+              width={48}
+              height={48}
+              className="w-full h-full object-contain"
+            />
+          ) : benefit.partner?.name ? (
             <span className="text-lg font-bold text-gold-dark">
-              {benefit.partnerName.charAt(0)}
+              {benefit.partner.name.charAt(0)}
             </span>
           ) : (
             <GiftIcon className="w-6 h-6 text-muted" />
@@ -48,7 +56,7 @@ export function BenefitCard({ benefit }: BenefitCardProps) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-muted mb-1">{benefit.partnerName}</p>
+          <p className="text-xs text-muted mb-1">{benefit.partner?.name}</p>
           <h3 className="font-semibold text-ink text-sm leading-snug line-clamp-2 group-hover:text-gold-dark transition-colors">
             {benefit.headline}
           </h3>
@@ -68,9 +76,16 @@ export function BenefitCard({ benefit }: BenefitCardProps) {
         </div>
       )}
 
-      {/* What You Get Preview */}
-      {benefit.whatYouGet && (
-        <p className="text-xs text-muted line-clamp-2 mb-4">{benefit.whatYouGet}</p>
+      {/* Eligibility Note Preview */}
+      {benefit.eligibilityNote && (
+        <p className="text-xs text-muted line-clamp-2 mb-4">{benefit.eligibilityNote}</p>
+      )}
+
+      {/* AI Reason */}
+      {benefit.aiApplied && benefit.aiReason && (
+        <p className="text-xs text-gold-dark italic mb-4 line-clamp-2">
+          ✨ {benefit.aiReason}
+        </p>
       )}
 
       {/* Footer */}
