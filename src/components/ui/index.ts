@@ -20,6 +20,9 @@ export { BenefitCard, BenefitCardSkeleton } from "./benefit-card";
 export { PitchDeckUpload } from "./pitch-deck-upload";
 export { BioLinksEditor, type BioLinksEditorRef } from "./bio-links-editor";
 
+// Engagement tracking
+export { TrackedLink } from "./tracked-link";
+
 // Loading and error states
 export { LoadingSpinner } from "./loading-spinner";
 export { PageLoader } from "./page-loader";
