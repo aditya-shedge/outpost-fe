@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   getEngagementSummary,
@@ -44,6 +44,22 @@ function getContentLink(contentType: ContentType, contentId: string): string {
 }
 
 export default function AdminEngagementPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <EngagementContent />
+    </Suspense>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center h-64">
+      <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
+function EngagementContent() {
   const defaultRange = getDefaultDateRange();
   
   const [summary, setSummary] = useState<EngagementSummary | null>(null);
