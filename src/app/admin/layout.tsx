@@ -98,7 +98,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Main Content */}
         <main className="flex-1 p-6">
-          {children}
+          <Suspense fallback={<PageLoader />}>
+            {children}
+          </Suspense>
         </main>
       </div>
     </div>
