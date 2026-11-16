@@ -156,3 +156,39 @@ export interface WithAiFields {
 export type GrantWithAi = GrantDetailResponse & WithAiFields;
 export type ChallengeWithAi = ChallengeResponse & WithAiFields;
 export type MentorWithAi = MentorDetailResponse & WithAiFields;
+
+// ============================================
+// Admin Engagement Dashboard (OP-085)
+// ============================================
+
+export type ContentType = "GRANT" | "CHALLENGE" | "MENTOR";
+
+export interface ContentStats {
+  contentId: string;
+  contentType: ContentType;
+  viewCount: number;
+  clickCount: number;
+}
+
+export interface TimeSeriesPoint {
+  period: string;
+  count: number;
+}
+
+export interface DimensionCount {
+  dimension: string;
+  count: number;
+}
+
+export interface EngagementSummaryResponse {
+  topViewedContent: ContentStats[];
+  topClickedContent: ContentStats[];
+  viewsByWeek: TimeSeriesPoint[];
+  viewsByMonth: TimeSeriesPoint[];
+  viewsBySector: DimensionCount[];
+  viewsByStage: DimensionCount[];
+}
+
+export interface ContentStatsWithName extends ContentStats {
+  name: string;
+}

@@ -8,6 +8,7 @@ import { PageLoader } from "@/components/ui";
 
 const adminNavItems = [
   { href: "/admin", label: "Dashboard", icon: DashboardIcon },
+  { href: "/admin/engagement", label: "Engagement", icon: EngagementIcon },
   { href: "/admin/grants", label: "Grants", icon: GrantsIcon },
   { href: "/admin/challenges", label: "Challenges", icon: ChallengesIcon },
   { href: "/admin/mentors", label: "Mentors", icon: MentorsIcon },
@@ -112,6 +113,15 @@ function DashboardIcon({ className }: { className?: string }) {
       <rect x="14" y="3" width="7" height="5" />
       <rect x="14" y="12" width="7" height="9" />
       <rect x="3" y="16" width="7" height="5" />
+    </svg>
+  );
+}
+
+function EngagementIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 3v18h18" />
+      <path d="m19 9-5 5-4-4-3 3" />
     </svg>
   );
 }
