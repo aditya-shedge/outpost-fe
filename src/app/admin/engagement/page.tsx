@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   getEngagementSummary,
@@ -8,6 +8,9 @@ import {
   type EngagementSummary,
   type ContentEngagement,
 } from "@/lib/api/engagement";
+import { getGrantById } from "@/lib/api/grants";
+import { getChallengeById } from "@/lib/api/challenges";
+import { getMentorById } from "@/lib/api/mentors";
 import { Select } from "@/components/ui";
 import { toast } from "sonner";
 
@@ -44,22 +47,6 @@ function getContentLink(contentType: ContentType, contentId: string): string {
 }
 
 export default function AdminEngagementPage() {
-  return (
-    <Suspense fallback={<LoadingState />}>
-      <EngagementContent />
-    </Suspense>
-  );
-}
-
-function LoadingState() {
-  return (
-    <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
-}
-
-function EngagementContent() {
   const defaultRange = getDefaultDateRange();
   
   const [summary, setSummary] = useState<EngagementSummary | null>(null);
@@ -67,6 +54,39 @@ function EngagementContent() {
   const [contentTypeFilter, setContentTypeFilter] = useState<ContentType | "">("");
   const [fromDate, setFromDate] = useState(defaultRange.from);
   const [toDate, setToDate] = useState(defaultRange.to);
+  const [contentNames, setContentNames] = useState<Record<string, string>>({});
+
+  // Fetch content names for the items in the summary
+  const fetchContentNames = useCallback(async (data: EngagementSummary) => {
+    const allItems = [...data.topByViews, ...data.topByClicks];
+    const uniqueItems = allItems.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.contentId === item.contentId)
+    );
+
+    const names: Record<string, string> = {};
+
+    await Promise.all(
+      uniqueItems.map(async (item) => {
+        try {
+          if (item.contentType === "GRANT") {
+            const grant = await getGrantById(item.contentId);
+            if (grant?.name) names[item.contentId] = grant.name;
+          } else if (item.contentType === "CHALLENGE") {
+            const challenge = await getChallengeById(item.contentId);
+            if (challenge?.title) names[item.contentId] = challenge.title;
+          } else if (item.contentType === "MENTOR") {
+            const mentor = await getMentorById(item.contentId);
+            if (mentor?.name) names[item.contentId] = mentor.name;
+          }
+        } catch {
+          // Silently fail - will show ID instead
+        }
+      })
+    );
+
+    setContentNames(names);
+  }, []);
 
   const fetchSummary = useCallback(async () => {
     setIsLoading(true);
@@ -77,13 +97,17 @@ function EngagementContent() {
         to: toDate,
       });
       setSummary(data);
+      // Fetch content names after getting summary
+      if (data.topByViews.length > 0 || data.topByClicks.length > 0) {
+        fetchContentNames(data);
+      }
     } catch (error) {
       console.error("Failed to fetch engagement summary:", error);
       toast.error("Failed to load engagement data");
     } finally {
       setIsLoading(false);
     }
-  }, [contentTypeFilter, fromDate, toDate]);
+  }, [contentTypeFilter, fromDate, toDate, fetchContentNames]);
 
   useEffect(() => {
     fetchSummary();
@@ -153,11 +177,13 @@ function EngagementContent() {
               title="Top 10 by Views"
               data={summary!.topByViews}
               sortBy="views"
+              contentNames={contentNames}
             />
             <TopContentTable
               title="Top 10 by Clicks"
               data={summary!.topByClicks}
               sortBy="clicks"
+              contentNames={contentNames}
             />
           </div>
 
@@ -200,10 +226,12 @@ function TopContentTable({
   title,
   data,
   sortBy,
+  contentNames,
 }: {
   title: string;
   data: ContentEngagement[];
   sortBy: "views" | "clicks";
+  contentNames: Record<string, string>;
 }) {
   if (data.length === 0) {
     return null;
@@ -232,7 +260,7 @@ function TopContentTable({
                   className="text-sm text-white hover:text-gold transition-colors"
                   target="_blank"
                 >
-                  {item.contentId.slice(0, 8)}...
+                  {contentNames[item.contentId] || item.contentId.slice(0, 8) + "..."}
                 </Link>
               </td>
               <td className="px-4 py-2">
