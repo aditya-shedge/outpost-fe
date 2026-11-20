@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -46,14 +46,24 @@ export default function BenefitDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [codeRevealed, setCodeRevealed] = useState(false);
+  
+  // Prevent duplicate fetches from React Strict Mode double-invocation
+  const fetchedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Skip if already fetched this ID
+    if (!benefitId || fetchedIdRef.current === benefitId) {
+      return;
+    }
+
     const fetchBenefit = async () => {
+      fetchedIdRef.current = benefitId;
       const data = await getBenefit(benefitId);
       if (data) {
         setBenefit(data);
       } else {
         setNotFound(true);
+        fetchedIdRef.current = null; // Allow retry
       }
       setIsLoading(false);
     };

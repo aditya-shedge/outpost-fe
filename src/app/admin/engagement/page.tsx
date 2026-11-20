@@ -129,13 +129,13 @@ export default function AdminEngagementPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-8">
+      <div className="flex flex-wrap items-end gap-4 mb-8">
         <div>
           <label className="block text-sm text-gray-400 mb-1">Content Type</label>
           <Select
             value={contentTypeFilter}
             onChange={(e) => setContentTypeFilter(e.target.value as ContentType | "")}
-            className="w-40 bg-[#16162a] border-[#2d2d4a] text-white"
+            className="h-10 w-40 bg-[#16162a] border-[#2d2d4a] text-white text-sm"
           >
             <option value="">All Types</option>
             <option value="GRANT">Grants</option>
@@ -161,6 +161,17 @@ export default function AdminEngagementPage() {
             className="h-10 px-3 bg-[#16162a] border border-[#2d2d4a] text-white text-sm rounded focus:outline-none focus:border-gold"
           />
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            setContentTypeFilter("");
+            setFromDate(defaultRange.from);
+            setToDate(defaultRange.to);
+          }}
+          className="h-10 px-4 text-sm text-gray-400 hover:text-white border border-[#2d2d4a] hover:border-gray-500 rounded transition-colors"
+        >
+          Clear filters
+        </button>
       </div>
 
       {isLoading ? (
@@ -347,8 +358,13 @@ function BreakdownChart({ title, data }: { title: string; data: { name: string; 
 }
 
 function formatWeekLabel(dateStr: string): string {
-  const date = new Date(dateStr);
-  return `${date.getMonth() + 1}/${date.getDate()}`;
+  const startDate = new Date(dateStr);
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + 6);
+  
+  const formatDay = (d: Date) => d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  
+  return `${formatDay(startDate)} - ${formatDay(endDate)}`;
 }
 
 function BarChartIcon({ className }: { className?: string }) {
