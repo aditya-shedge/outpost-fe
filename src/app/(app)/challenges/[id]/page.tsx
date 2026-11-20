@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, notFound } from "next/navigation";
 import Link from "next/link";
 import { getChallengeById } from "@/lib/api/challenges";
@@ -25,15 +25,25 @@ export default function ChallengeDetailPage() {
   const [challenge, setChallenge] = useState<ChallengeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Prevent duplicate fetches from React Strict Mode double-invocation
+  const fetchedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Skip if already fetched this ID
+    if (!id || fetchedIdRef.current === id) {
+      return;
+    }
+
     async function loadChallenge() {
+      fetchedIdRef.current = id;
       try {
         const data = await getChallengeById(id);
         setChallenge(data);
       } catch (err) {
         console.error("Failed to load challenge:", err);
         setError("Challenge not found or unavailable.");
+        fetchedIdRef.current = null; // Allow retry on error
       } finally {
         setIsLoading(false);
       }

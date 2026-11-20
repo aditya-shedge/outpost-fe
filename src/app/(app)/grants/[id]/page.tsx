@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getGrantById } from "@/lib/api/grants";
@@ -13,27 +13,36 @@ export default function GrantDetailPage() {
   const [grant, setGrant] = useState<GrantDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Prevent duplicate fetches from React Strict Mode double-invocation
+  const fetchedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    const id = params.id as string;
+    
+    // Skip if already fetched this ID
+    if (!id || fetchedIdRef.current === id) {
+      return;
+    }
+
     async function loadGrant() {
       setIsLoading(true);
       setError(null);
+      fetchedIdRef.current = id;
 
       try {
-        const id = params.id as string;
         const data = await getGrantById(id);
         setGrant(data);
       } catch (err) {
         console.error("Failed to load grant:", err);
         setError("Grant not found or failed to load.");
+        fetchedIdRef.current = null; // Allow retry on error
       } finally {
         setIsLoading(false);
       }
     }
 
-    if (params.id) {
-      loadGrant();
-    }
+    loadGrant();
   }, [params.id]);
 
   const formatDeadline = (deadline: string | undefined) => {
