@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getMentorById } from "@/lib/api/mentors";
 import { Icon, LoadingSpinner } from "@/components/ui";
+import { TrackedLink } from "@/components/ui/tracked-link";
 import type { MentorDetailResponse } from "@/lib/api/types";
 
 function getInitials(name: string | undefined): string {
@@ -112,15 +113,15 @@ export default function MentorDetailPage() {
 
             {/* Book a call CTA */}
             {mentor.bookingUrl && (
-              <a
+              <TrackedLink
                 href={mentor.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                contentType="MENTOR"
+                contentId={mentor.id!}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-green text-white text-sm font-medium hover:bg-green-dark transition-colors"
               >
                 <Icon name="calendar" className="size-4" />
                 Book a call
-              </a>
+              </TrackedLink>
             )}
           </div>
         </div>
@@ -199,15 +200,15 @@ export default function MentorDetailPage() {
               Sessions are scheduled via Cal.com. Outpost does not store booking data.
             </p>
             {mentor.bookingUrl && (
-              <a
+              <TrackedLink
                 href={mentor.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                contentType="MENTOR"
+                contentId={mentor.id!}
                 className="inline-flex items-center gap-2 text-sm text-green-dark hover:text-green transition-colors"
               >
                 <Icon name="external-link" className="size-4" />
                 Open booking page
-              </a>
+              </TrackedLink>
             )}
           </section>
         </div>

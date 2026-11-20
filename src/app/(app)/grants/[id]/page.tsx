@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getGrantById } from "@/lib/api/grants";
 import type { GrantDetailResponse } from "@/lib/api/types";
+import { TrackedLink } from "@/components/ui/tracked-link";
 
 export default function GrantDetailPage() {
   const params = useParams();
@@ -216,17 +217,17 @@ export default function GrantDetailPage() {
           {/* Apply CTA */}
           {grant.sourceUrl && (
             <div className="p-5 bg-paper-light border border-line">
-              <a
+              <TrackedLink
                 href={grant.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                contentType="GRANT"
+                contentId={grant.id!}
                 className="flex items-center justify-center gap-2 w-full h-12 bg-gold hover:bg-gold-hover text-white font-semibold text-sm transition-colors"
               >
                 Visit Official Source
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
-              </a>
+              </TrackedLink>
               <p className="mt-3 text-xs text-muted text-center">
                 Opens in a new tab
               </p>

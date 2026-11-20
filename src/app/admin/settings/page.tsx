@@ -9,6 +9,7 @@ export default function AdminSettingsPage() {
     grants: false,
     challenges: false,
     mentors: false,
+    offers: false,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -89,6 +90,13 @@ export default function AdminSettingsPage() {
             description="AI ranking for mentors listing"
             enabled={settings.mentors ?? false}
             onToggle={() => handleToggle("mentors")}
+            disabled={saving}
+          />
+          <ToggleRow
+            label="Benefits"
+            description="AI ranking for benefits/offers listing"
+            enabled={settings.offers ?? false}
+            onToggle={() => handleToggle("offers")}
             disabled={saving}
           />
         </div>

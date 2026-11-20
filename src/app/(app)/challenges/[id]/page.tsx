@@ -5,6 +5,7 @@ import { useParams, notFound } from "next/navigation";
 import Link from "next/link";
 import { getChallengeById } from "@/lib/api/challenges";
 import { Icon, LoadingSpinner } from "@/components/ui";
+import { TrackedLink } from "@/components/ui/tracked-link";
 import type { ChallengeResponse } from "@/lib/api/types";
 
 function formatDeadline(deadline: string | undefined): string | null {
@@ -204,21 +205,25 @@ export default function ChallengeDetailPage() {
 
       {/* CTA */}
       <section className="flex items-center gap-4 pt-6 border-t border-line">
-        {challenge.applyUrl && (
-          <a
+        {challenge.applyUrl && !isClosed && (
+          <TrackedLink
             href={challenge.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`inline-flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
-              isClosed
-                ? "bg-muted/20 text-muted cursor-not-allowed pointer-events-none"
-                : "bg-orange-500 text-white hover:bg-orange-600"
-            }`}
-            aria-disabled={isClosed}
+            contentType="CHALLENGE"
+            contentId={challenge.id!}
+            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition-colors"
           >
-            {isClosed ? "Applications Closed" : "Apply Now"}
-            {!isClosed && <Icon name="arrow" className="size-4" />}
-          </a>
+            Apply Now
+            <Icon name="arrow" className="size-4" />
+          </TrackedLink>
+        )}
+        
+        {challenge.applyUrl && isClosed && (
+          <span
+            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium bg-muted/20 text-muted cursor-not-allowed"
+            aria-disabled="true"
+          >
+            Applications Closed
+          </span>
         )}
 
         <Link

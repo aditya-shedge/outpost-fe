@@ -62,69 +62,70 @@ export function OpportunityCard({ type, data, showAiReason = false }: Opportunit
   };
 
   return (
-    <article 
-      className={`group bg-paper-light border border-line p-5 flex flex-col h-full transition-all hover:shadow-md hover:-translate-y-0.5 ${isClosed ? "opacity-60" : ""}`}
-    >
-      {/* Header: Badge + Bookmark */}
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-1 ${badgeColors[type]}`}>
-          {type === "grant" ? "Grant" : "Challenge"}
-        </span>
-        <BookmarkButton
-          item={{
-            id: id!,
-            type: type,
-            name: title,
-          }}
-        />
-      </div>
-
-      {/* Organization */}
-      <p className="text-xs text-muted mb-1 truncate">{organization}</p>
-
-      {/* Title */}
-      <h3 className="font-semibold text-ink text-[15px] leading-snug mb-2 line-clamp-2">
-        {title}
-      </h3>
-
-      {/* Description */}
-      <p className="text-sm text-muted leading-relaxed mb-4 line-clamp-2 flex-1">
-        {summary}
-      </p>
-
-      {/* Meta: Amount + Deadline */}
-      <div className="flex items-center gap-4 text-xs text-muted mb-4">
-        {type === "grant" && amount && (
-          <span className="flex items-center gap-1">
-            <Icon name="currency" className="size-3.5" />
-            {amount}
-          </span>
-        )}
-        <span className={`flex items-center gap-1 ${expired ? "text-rose-dark" : ""}`}>
-          <Icon name="calendar" className="size-3.5" />
-          {formatDeadline(deadline)}
-        </span>
-        {isClosed && (
-          <span className="text-rose-dark font-medium">Closed</span>
-        )}
-      </div>
-
-      {/* AI Reason */}
-      {showAiReason && data.aiReason && (
-        <div className="flex items-start gap-2 text-xs text-muted bg-gold-light/50 px-3 py-2 mb-4 -mx-1">
-          <Icon name="sparkles" className="size-3.5 text-gold-dark shrink-0 mt-0.5" />
-          <span>{data.aiReason}</span>
-        </div>
-      )}
-
-      {/* CTA */}
-      <Link
-        href={href}
-        className="inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-medium border border-ink text-ink hover:bg-ink hover:text-paper-light transition-colors"
+    <Link href={href} className="block">
+      <article 
+        className={`group bg-paper-light border border-line p-5 flex flex-col h-full transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-gold ${isClosed ? "opacity-60" : ""}`}
       >
-        View opportunity
-        <Icon name="arrow-right" className="size-4" />
-      </Link>
-    </article>
+        {/* Header: Badge + Bookmark */}
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-1 ${badgeColors[type]}`}>
+            {type === "grant" ? "Grant" : "Challenge"}
+          </span>
+          <BookmarkButton
+            item={{
+              id: id!,
+              type: type,
+              name: title,
+            }}
+          />
+        </div>
+
+        {/* Organization */}
+        <p className="text-xs text-muted mb-1 truncate">{organization}</p>
+
+        {/* Title */}
+        <h3 className="font-semibold text-ink text-[15px] leading-snug mb-2 line-clamp-2 group-hover:text-gold-dark transition-colors">
+          {title}
+        </h3>
+
+        {/* Description */}
+        <p className="text-sm text-muted leading-relaxed mb-4 line-clamp-2 flex-1">
+          {summary}
+        </p>
+
+        {/* Meta: Amount + Deadline */}
+        <div className="flex items-center gap-4 text-xs text-muted mb-4">
+          {type === "grant" && amount && (
+            <span className="flex items-center gap-1">
+              <Icon name="currency" className="size-3.5" />
+              {amount}
+            </span>
+          )}
+          <span className={`flex items-center gap-1 ${expired ? "text-rose-dark" : ""}`}>
+            <Icon name="calendar" className="size-3.5" />
+            {formatDeadline(deadline)}
+          </span>
+          {isClosed && (
+            <span className="text-rose-dark font-medium">Closed</span>
+          )}
+        </div>
+
+        {/* AI Reason */}
+        {showAiReason && data.aiReason && (
+          <div className="flex items-start gap-2 text-xs text-muted bg-gold-light/50 px-3 py-2 mb-4 -mx-1">
+            <Icon name="sparkles" className="size-3.5 text-gold-dark shrink-0 mt-0.5" />
+            <span>{data.aiReason}</span>
+          </div>
+        )}
+
+        {/* CTA */}
+        <span
+          className="inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-medium border border-ink text-ink group-hover:bg-ink group-hover:text-paper-light transition-colors"
+        >
+          View opportunity
+          <Icon name="arrow-right" className="size-4" />
+        </span>
+      </article>
+    </Link>
   );
 }
